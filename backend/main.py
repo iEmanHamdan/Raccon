@@ -7,6 +7,7 @@ from api.health.router import router as health_router
 from api.admin.router import router as admin_router
 from api.packs.router import router as packs_router
 from api.events.router import router as events_router
+from api.journey.router import router as journey_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,6 +22,7 @@ app.include_router(health_router)
 app.include_router(admin_router)
 app.include_router(packs_router)
 app.include_router(events_router)
+app.include_router(journey_router)
 
 @app.get("/")
 def root():
