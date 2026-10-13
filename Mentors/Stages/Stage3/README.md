@@ -1440,6 +1440,12 @@ Direct commits to the `main` and `dev` branches are restricted. All changes must
 3. **Obtain Peer Review:** At least one team member must review and approve the PR.
 4. **Squash and Merge:** Commits are squashed when merging to keep the repository history clear and readable.
 
+#### Project Management (Trello)
+
+We use **Trello** to manage project tasks, organize development activities, track progress, and coordinate work across the team.
+
+- **Trello Board:** [Raccon Project Board](https://trello.com/invite/b/6ac06add5461463aafee2998/ATTIe0efc74142944a0e5543ee80f3387fe624BD55D9/raccon)
+
 ### Quality Assurance (QA) and CI/CD Plan
 
 Quality Assurance is integrated into the SCM workflow through **GitHub Actions**. Automated checks validate code before it reaches staging or production.
