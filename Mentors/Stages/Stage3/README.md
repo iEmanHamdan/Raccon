@@ -1,4 +1,4 @@
-# Raccon Technical Documentation
+#ramz Raccon Technical Documentation
 
 ## Table of Contents
 
@@ -413,7 +413,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - The confirmed choice takes effect immediately and remains active for subsequent eligible scans until replaced. The effect can include the chooser; the precise set of players affected immediately must be specified in the rules.
 - The player who configures the trap is also subject to its effect on a later eligible scan.
 - Any Freeze or Boom behavior configured through Choose Trap should follow the same player-specific rules as a directly configured Freeze or Boom tag.
-- Choose-trap configuration should be represented within the trap tag’s event-specific JSONB content.
+- set-trap configuration should be represented within the trap tag’s event-specific JSONB content.
 
 ---
 
@@ -1219,10 +1219,9 @@ sequenceDiagram
 | `POST` | `/auth/reset-password` | Public | Finish password recovery |
 | `GET` | `/events/{event_id}/leaderboard` | User | Leaderboard |
 | `GET` | `/events/{event_id}/play-state` | User | Participation/progress |
-| `POST` | `/events/{event_id}/choose-trap` | User | Confirm a persistent Choose Trap selection |
+| `POST` | `/journey/set-trap` | User | Confirm a persistent Choose Trap selection |
 | `POST` | `/events/{event_id}/editing-session` | Owner | Explicitly open a configuration editing session |
 | `POST` | `/events/{event_id}/images` | Owner | Upload a tag image to Cloudflare R2 |
-| `POST` | `/integrations/ramz/webhook` | Store | Purchase notification |
 
 # Raccon API Documentation
 
@@ -1301,7 +1300,7 @@ The customer follows a Ramz-provided link to the **React frontend** at `GET http
 | `POST /journey/scan` | Authenticated player | JSON: `tag_hash`, `injected_user_hash` (UUID) | `200`: scan outcome and tag information; event contract includes `result`, `tag_sequence`, `tag_type`, `content`, `round_id`, `points_delta`, `score`, `highest_sequential_tag`, `claimed`, `frozen_until`, `tags_left`, `time_remaining_seconds` | Injected UUID must equal JWT subject (`403` otherwise); unknown hash: `404`; missing event or non-live status: `400`. JWT authenticates identity; supplied UUID does **not** prove physical NFC tapping. Event state updates must be atomic. |
 | `GET /events/{event_id}/leaderboard` | Authenticated event player | Path: `event_id` | `200`: `round_id`, mode, ranked `players` (UUID, display name, score/progress), caller's rank | Current-round ranking derived from `events.record`. Open Hunt: first-claim points minus Boom penalties; Sequential: highest consecutive tag. |
 | `GET /events/{event_id}/play-state` | Authenticated event player | Path: `event_id` | `200`: `round_id`, `event_status`, `score`, `highest_sequential_tag`, `frozen_until`, optional `tags_left`, `time_remaining_seconds` | Derived from `events.record`; unknown event: `404`; unauthorized: `403`. |
-| `POST /events/{event_id}/choose-trap` | Authenticated event player | JSON: `tag_id`, `trap_type` (`freeze` or `boom`), `duration_seconds` for Freeze | `200`: confirmed selection and `round_id` | Live Open Hunt round; tag must be configured as `choose`. Selection applies immediately and persists until replaced. Chooser is not immune. Freeze: 30–180 seconds in steps of 30; Boom: minus one point, floor zero. Exact immediate recipient set remains a event decision. Transactional update. |
+| `POST /journey/set-trap` | Authenticated event player | JSON: `tag_id`, `trap_type` (`freeze` or `boom`), `duration_seconds` for Freeze | `200`: confirmed selection and `round_id` | Live Open Hunt round; tag must be configured as `choose`. Selection applies immediately and persists until replaced. Chooser is not immune. Freeze: 30–180 seconds in steps of 30; Boom: minus one point, floor zero. Exact immediate recipient set remains an event decision. Transactional update. |
 
 **Scan request example:**
 
@@ -1336,7 +1335,6 @@ The customer follows a Ramz-provided link to the **React frontend** at `GET http
 |---|---|---|---|---|
 | `POST /auth/forgot-password` | Public | JSON: `email` | Confirmation response, identical whether the account exists or not | For an existing account, send a short-lived, single-use reset token out of band; avoid account enumeration. |
 | `POST /auth/reset-password` | Public | JSON: `reset_token`, `new_password`, `confirm_password` | Confirmation of password change | Verify token expiration, matching passwords, and password rules; consume token atomically; do not log secrets. |
-| `POST /integrations/ramz/webhook` | Verified Ramz integration | Provider-defined purchase event payload | Acknowledgment of accepted or already processed delivery | Authenticate provider delivery, deduplicate by event/order ID, associate purchase with an eligible pack; webhook alone does not claim the pack. Payload and verification scheme depend on Ramz's integration contract. |
 
 ### 1.7 Service health and documentation
 
