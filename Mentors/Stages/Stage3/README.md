@@ -187,7 +187,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 **Acceptance Criteria**
 
 - The user shall be able to view the available NFC pack options on the Raccon platform.
-- Each pack option shall display its gameplay mode (Sequential or Open Hunt), number of NFC tags, and price.
+- Each pack option shall display its mode (Sequential or Open Hunt), number of NFC tags, and price.
 - The user shall be able to select a pack and be redirected to its corresponding product page on Ramz to complete the purchase.
 - After a successful purchase, Ramz shall send the customer a unique claim link, such as `https://raccon.app/claim?token=<master-auth-token>`.
 - When the customer opens the claim link, the browser shall make an **HTTP GET request** to the React frontend route `/claim`, which displays the pack claim page and preserves the authorization token.
@@ -410,7 +410,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - Selecting Freeze should prompt the player to specify a duration selectable in 30-second increments, ranging from 30 seconds to 3 minutes.
 - Selecting Boom should configure a deduction of one point.
 - The player should only be able to select one trap type.
-- The confirmed choice takes effect immediately and remains active for subsequent eligible scans until replaced. The effect can include the chooser; the precise set of players affected immediately must be specified in the gameplay rules.
+- The confirmed choice takes effect immediately and remains active for subsequent eligible scans until replaced. The effect can include the chooser; the precise set of players affected immediately must be specified in the rules.
 - The player who configures the trap is also subject to its effect on a later eligible scan.
 - Any Freeze or Boom behavior configured through Choose Trap should follow the same player-specific rules as a directly configured Freeze or Boom tag.
 - Choose-trap configuration should be represented within the trap tag’s event-specific JSONB content.
@@ -711,7 +711,7 @@ Raccon separates physical inventory from event configuration. A pack is created 
 | `users` | `id: UUID`, `name`, `username`, `email`, `phone_number`, `password`, `role` | UUID primary key; unique username and email; `password` stores a password hash; `role` distinguishes admins |
 | `packs` | `id: UUID`, `owner_id: UUID?`, `mode`, `tags_count`, `master_auth_hash` | Nullable owner; positive tag count; unique single-use claim credential; store a verifier in the target security design |
 | `tags` | `id: UUID`, `pack_id: UUID`, `static_hash`, `sequence_num`, `is_printed` | Unique opaque NFC token; unique `(pack_id, sequence_num)`; factory programming state |
-| `events` | `id: UUID`, `pack_id: UUID`, `title`, `status`, `edits_used`, `record: JSONB` | `UNIQUE(pack_id)`; `edits_used` from 0 to 3; `record` stores all round/gameplay data |
+| `events` | `id: UUID`, `pack_id: UUID`, `title`, `status`, `edits_used`, `record: JSONB` | `UNIQUE(pack_id)`; `edits_used` from 0 to 3; `record` stores all round data |
 | `event_tags` | `id: UUID`, `event_id: UUID`, `tag_id: UUID`, `tag_type`, `content: JSONB` | Unique `(event_id, tag_id)`; tag must belong to the event's pack |
 
 
@@ -754,7 +754,7 @@ erDiagram
         string title
         string status
         int edits_used
-        JSONB record "all rounds and gameplay history"
+        JSONB record "all rounds and event history"
     }
     EVENT_TAGS {
         UUID id PK
@@ -765,7 +765,7 @@ erDiagram
     }
 ```
 
-### Gameplay Record JSONB Structure
+### Event Record JSONB Structure
 
 Scan entries are append-only within their round.
 
@@ -928,7 +928,7 @@ Clue image files reside in Cloudflare R2; PostgreSQL stores their references, no
 
 ## High-Level Sequence Diagrams
 
-The following diagrams describe registration, event management, tag configuration, and gameplay. Configuration can be saved during initial `draft` setup or while `paused`, but not while `live`.
+The following diagrams describe registration, event management, tag configuration, and event. Configuration can be saved during initial `draft` setup or while `paused`, but not while `live`.
 
 ### 1. User Registration
 
@@ -1082,7 +1082,7 @@ sequenceDiagram
             else Boom
                 Web-->>Owner: Fixed one-point penalty
             else Choose
-                Web-->>Owner: Players choose Freeze or Boom during gameplay
+                Web-->>Owner: Players choose Freeze or Boom during event
             end
             Owner->>Web: Save complete tag configuration
             Web->>API: PUT /events/{event_id}/setup
@@ -1101,7 +1101,7 @@ sequenceDiagram
     end
 ```
 
-### 5. NFC Tag Scanning and Gameplay
+### 5. NFC Tag Scanning and Event
 
 ```mermaid
 sequenceDiagram
@@ -1127,7 +1127,7 @@ sequenceDiagram
         API->>DB: Resolve tag, pack and event
         DB-->>API: Tag and event details
         alt Unknown tag or event not live
-            API-->>Web: Reject scan without gameplay changes
+            API-->>Web: Reject scan without Event changes
             Web-->>Player: Display scan error
         else Event is live
             API->>DB: Lock event and read active round in events.record
@@ -1180,7 +1180,7 @@ sequenceDiagram
 | View and Rename Packages | Lists owned events, checks ownership, and renames an event without consuming configuration edits. |
 | Configure NFC Tag Content | Saves clues and R2 image references, respecting draft setup, paused-only editing, and editing quotas. |
 | Configure NFC Tag Traps | Configures Open Hunt traps with validation and paused-only editing rules. |
-| NFC Tag Scanning and Gameplay | Authenticates players, processes live scans and trap effects, and updates current-round gameplay in `events.record`. |
+| NFC Tag Scanning and Event | Authenticates players, processes live scans and trap effects, and updates current-round event in `events.record`. |
 
 
 ## Raccon REST API Documentation
@@ -1294,14 +1294,14 @@ The customer follows a Ramz-provided link to the **React frontend** at `GET http
 
 **Round lifecycle:** The **ابدأ الجولة** control changes `paused → live`, starting a new round with reset scores, claims, and progress. The **انهاء الجولة** control changes `live → paused`, finalizing the round and leaderboard. All round data remains in `events.record` (JSONB). Saving event configuration while `live` is rejected; editing and saving are permitted only while `paused` (or during initial setup in `draft`). The `PUT` setup behavior remains full replacement.
 
-### 1.5 Player journey and gameplay
+### 1.5 Player journey and Event
 
 | Endpoint | Access | Request | Successful response | Validation and important behavior |
 |---|---|---|---|---|
-| `POST /journey/scan` | Authenticated player | JSON: `tag_hash`, `injected_user_hash` (UUID) | `200`: scan outcome and tag information; gameplay contract includes `result`, `tag_sequence`, `tag_type`, `content`, `round_id`, `points_delta`, `score`, `highest_sequential_tag`, `claimed`, `frozen_until`, `tags_left`, `time_remaining_seconds` | Injected UUID must equal JWT subject (`403` otherwise); unknown hash: `404`; missing event or non-live status: `400`. JWT authenticates identity; supplied UUID does **not** prove physical NFC tapping. Gameplay state updates must be atomic. |
+| `POST /journey/scan` | Authenticated player | JSON: `tag_hash`, `injected_user_hash` (UUID) | `200`: scan outcome and tag information; event contract includes `result`, `tag_sequence`, `tag_type`, `content`, `round_id`, `points_delta`, `score`, `highest_sequential_tag`, `claimed`, `frozen_until`, `tags_left`, `time_remaining_seconds` | Injected UUID must equal JWT subject (`403` otherwise); unknown hash: `404`; missing event or non-live status: `400`. JWT authenticates identity; supplied UUID does **not** prove physical NFC tapping. Event state updates must be atomic. |
 | `GET /events/{event_id}/leaderboard` | Authenticated event player | Path: `event_id` | `200`: `round_id`, mode, ranked `players` (UUID, display name, score/progress), caller's rank | Current-round ranking derived from `events.record`. Open Hunt: first-claim points minus Boom penalties; Sequential: highest consecutive tag. |
 | `GET /events/{event_id}/play-state` | Authenticated event player | Path: `event_id` | `200`: `round_id`, `event_status`, `score`, `highest_sequential_tag`, `frozen_until`, optional `tags_left`, `time_remaining_seconds` | Derived from `events.record`; unknown event: `404`; unauthorized: `403`. |
-| `POST /events/{event_id}/choose-trap` | Authenticated event player | JSON: `tag_id`, `trap_type` (`freeze` or `boom`), `duration_seconds` for Freeze | `200`: confirmed selection and `round_id` | Live Open Hunt round; tag must be configured as `choose`. Selection applies immediately and persists until replaced. Chooser is not immune. Freeze: 30–180 seconds in steps of 30; Boom: minus one point, floor zero. Exact immediate recipient set remains a gameplay decision. Transactional update. |
+| `POST /events/{event_id}/choose-trap` | Authenticated event player | JSON: `tag_id`, `trap_type` (`freeze` or `boom`), `duration_seconds` for Freeze | `200`: confirmed selection and `round_id` | Live Open Hunt round; tag must be configured as `choose`. Selection applies immediately and persists until replaced. Chooser is not immune. Freeze: 30–180 seconds in steps of 30; Boom: minus one point, floor zero. Exact immediate recipient set remains a event decision. Transactional update. |
 
 **Scan request example:**
 
