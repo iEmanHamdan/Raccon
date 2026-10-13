@@ -19,6 +19,7 @@ class TagContent(BaseModel):
     boom: Optional[int] = None
     freeze: Optional[int] = None
     choose: Optional[bool] = None
+    was_choose: Optional[bool] = None
 
 class TagConfig(BaseModel):
     tag_id: uuid.UUID
@@ -26,10 +27,28 @@ class TagConfig(BaseModel):
     content: TagContent
 
     @model_validator(mode='after')
-    def validate_content_match_type(self) -> 'TagConfig':
-        if self.tag_type == "trap":
-            if self.content.boom is None and self.content.freeze is None and self.content.choose is None:
-                raise ValueError("Invalid tag configuration.")
+    def clean_and_validate_content(self) -> 'TagConfig':
+        c = self.content
+        
+        if self.tag_type == "clue":
+            c.boom = c.freeze = c.choose = c.was_choose = None
+            
+        elif self.tag_type == "trap":
+            c.hint = c.image = None
+            
+            c.boom = c.boom if c.boom else None
+            c.freeze = c.freeze if c.freeze else None
+            c.choose = c.choose if c.choose else None
+            c.was_choose = None
+            if sum(bool(x) for x in (c.boom, c.freeze, c.choose)) != 1:
+                raise ValueError("tag_type 'trap' must have exactly one of 'boom', 'freeze', or 'choose' set.")
+            
+            if c.freeze and c.freeze > 180:
+                raise ValueError("tag_type 'trap' with 'freeze' must have a value between 1 and 180 seconds.")
+                
+            if c.boom and c.boom != 1:
+                raise ValueError("tag_type 'trap' with 'boom' must have a value of 1.")
+                
         return self
 
 class EventSetupRequest(BaseModel):
