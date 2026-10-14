@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import init_db
 from api.auth.router import router as auth_router
@@ -24,6 +25,20 @@ app.include_router(admin_router)
 app.include_router(packs_router)
 app.include_router(events_router)
 app.include_router(journey_router)
+
+origins = [
+    "https://react-learning.aalsalhi-eng.workers.dev",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
