@@ -4,6 +4,7 @@ from typing import Optional
 
 class UserResponse(BaseModel):
     id: uuid.UUID
+    user_hash: str
     name: str
     username: str
     email: str

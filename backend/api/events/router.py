@@ -67,10 +67,20 @@ def setup_event_journey(
     event = session.get(Event, event_id)
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
-    
+        
     pack = session.get(Pack, event.pack_id)
     if not pack or pack.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not own this pack.")
+
+    valid_tags = session.exec(select(Tag).where(Tag.pack_id == pack.id)).all()
+    valid_tag_ids = {tag.id for tag in valid_tags}
+        
+    for tag_data in request.tags_config:
+        if tag_data.tag_id not in valid_tag_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=f"Tag ID {tag_data.tag_id} does not belong to this pack."
+            )
 
     has_trap = any(tag.tag_type == "trap" for tag in request.tags_config)
     if has_trap and pack.mode != "open":
@@ -79,25 +89,34 @@ def setup_event_journey(
             detail="Only packs in 'open' mode can have trap tags configured."
         )
 
-    existing_tags = session.exec(select(EventTag).where(EventTag.event_id == event_id)).all()
-    for et in existing_tags:
-        session.delete(et)
-    
     for tag_data in request.tags_config:
-        event_tag = EventTag(
-            event_id=event.id,
-            tag_id=tag_data.tag_id,
-            tag_type=tag_data.tag_type,
-            content=tag_data.content.model_dump(exclude_none=True)
-        )
-        session.add(event_tag)
+        existing_tag = session.exec(
+            select(EventTag).where(
+                (EventTag.event_id == event.id) & (EventTag.tag_id == tag_data.tag_id)
+            )
+        ).first()
+
+        if existing_tag:
+            existing_tag.tag_type = tag_data.tag_type
+            existing_tag.content = tag_data.content.model_dump(exclude_none=True)
+            session.add(existing_tag)
+        else:
+            new_event_tag = EventTag(
+                event_id=event.id,
+                tag_id=tag_data.tag_id,
+                tag_type=tag_data.tag_type,
+                content=tag_data.content.model_dump(exclude_none=True)
+            )
+            session.add(new_event_tag)
 
     if event.status == "draft" and len(request.tags_config) > 0:
         event.status = "paused"
         session.add(event)
 
     session.commit()
-    return {"status": "success", "message": "Event journey setup completed."}
+    
+    return {"status": "success", "message": "Tag setup saved successfully."}
+
 
 @router.patch("/{event_id}", response_model=EventResponse)
 def update_event(

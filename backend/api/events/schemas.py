@@ -20,6 +20,8 @@ class TagContent(BaseModel):
     freeze: Optional[int] = None
     choose: Optional[bool] = None
     was_choose: Optional[bool] = None
+    
+    claimed_by: Optional[str] = None
 
 class TagConfig(BaseModel):
     tag_id: uuid.UUID
@@ -30,8 +32,11 @@ class TagConfig(BaseModel):
     def clean_and_validate_content(self) -> 'TagConfig':
         c = self.content
         
+        c.claimed_by = None
+        c.was_choose = None
+        
         if self.tag_type == "clue":
-            c.boom = c.freeze = c.choose = c.was_choose = None
+            c.boom = c.freeze = c.choose = None
             
         elif self.tag_type == "trap":
             c.hint = c.image = None
@@ -39,13 +44,13 @@ class TagConfig(BaseModel):
             c.boom = c.boom if c.boom else None
             c.freeze = c.freeze if c.freeze else None
             c.choose = c.choose if c.choose else None
-            c.was_choose = None
+            
             if sum(bool(x) for x in (c.boom, c.freeze, c.choose)) != 1:
                 raise ValueError("tag_type 'trap' must have exactly one of 'boom', 'freeze', or 'choose' set.")
             
             if c.freeze and c.freeze > 180:
                 raise ValueError("tag_type 'trap' with 'freeze' must have a value between 1 and 180 seconds.")
-                
+            
             if c.boom and c.boom != 1:
                 raise ValueError("tag_type 'trap' with 'boom' must have a value of 1.")
                 
@@ -73,3 +78,4 @@ class EventBase(BaseModel):
 
 class EventDetailResponse(EventBase):
     tags: List[EventTagConfigView]
+
