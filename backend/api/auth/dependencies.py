@@ -17,7 +17,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Dep
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
-        if user_id is None:
+        if user_id is None or payload.get("purpose") != "access":
             raise credentials_exception
     except jwt.PyJWTError:
         raise credentials_exception
