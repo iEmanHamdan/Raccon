@@ -1,7 +1,7 @@
 // The left side of the form witch have the animation of the nfc sacn and the context
-export default function AuthPromo({ scene, mobileTitle }) {
+export default function AuthPromo({ scene, mobileTitle, variant = "default" }) {
   return (
-    <div className="auth-promo">
+    <div className={`auth-promo auth-promo--${variant}`}>
       {/* NFC Animation */}
       <div className="auth-promo__scene">{scene}</div>
 
