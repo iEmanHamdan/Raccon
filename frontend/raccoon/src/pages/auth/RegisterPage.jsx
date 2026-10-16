@@ -78,7 +78,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout promo={<AuthPromo scene={<DehmScan />} />}>
+    <AuthLayout
+      promo={<AuthPromo scene={<DehmScan />} mobileTitle="أنشى حسابك" />}
+    >
       <RegisterForm
         onRegister={handleRegister}
         isSubmitting={isSubmitting}
