@@ -1,9 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 
-import "./styles/variables.css";
-import "./styles/global.css";
+import "./styles/global.css"; // All the Style is coming from here "All for one" :)
 
 import App from "./app/App";
 import reportWebVitals from "./reportWebVitals";

@@ -1,5 +1,4 @@
 import React from "react";
-import "../App.css";
 
 import {
   BrowserRouter,
@@ -10,7 +9,7 @@ import {
 } from "react-router-dom";
 
 // Auth Feature
-import RegisterPage from "../features/Auth/pages/RegisterPage";
+import RegisterPage from "../pages/auth/RegisterPage";
 
 function AppContent() {
   const location = useLocation();

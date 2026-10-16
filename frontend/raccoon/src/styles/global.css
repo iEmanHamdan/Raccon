@@ -1,3 +1,142 @@
+/* ==========================================
+   RACCON DESIGN SYSTEM
+   Global Styles
+========================================== */
+
+/* ==========================================
+   1. THMANYAH FONTS
+========================================== */
+
+@font-face {
+  font-family: "thmanyah sans";
+  src: url("../assets/fonts/thmanyahsans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "thmanyah sans";
+  src: url("../assets/fonts/thmanyahsans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "thmanyah sans";
+  src: url("../assets/fonts/thmanyahsans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "thmanyah serif display";
+  src: url("../assets/fonts/thmanyahserifdisplay-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================
+   2. DESIGN TOKENS
+========================================== */
+
+:root {
+  /* ===== Background Colors ===== */
+
+  --canvas: #f4fbf8;
+  --surface: #ffffff;
+
+  --panel: #1b1442;
+  --panel-raised: #281f63;
+  --night: #0d0a21;
+
+  /* ===== Text Colors ===== */
+
+  --ink: #1b1442;
+  --ink-muted: #337558;
+
+  --on-panel: #ffffff;
+  --on-panel-muted: #c7c2e4;
+
+  /* ===== Border Colors ===== */
+
+  --line: #d9d6ed;
+  --line-strong: #b4addb;
+
+  /* ===== Brand Colors ===== */
+
+  --mint: #c6ecdb;
+
+  --accent: #4333a5;
+  --accent-hover: #695cb7;
+  --accent-text: #4333a5;
+
+  --accent-soft: #ecebf6;
+
+  --on-accent: #ffffff;
+  --on-accent-soft: #362984;
+
+  /* ===== Primary Button ===== */
+
+  --primary: #448266;
+  --on-primary: #ecebf6;
+
+  /* ===== Validation Colors ===== */
+
+  --danger: #c0392b;
+
+  --danger-ring: rgba(192, 57, 43, 0.12);
+
+  --focus-ring: rgba(67, 51, 165, 0.18);
+
+  /* ===== Banner Colors ===== */
+
+  --banner-error-bg: #fdecec;
+  --banner-error-text: #c62828;
+
+  --banner-warning-bg: #fff1d6;
+  --banner-warning-text: #9a5b00;
+
+  --banner-info-bg: #ecebf6;
+  --banner-info-text: #362984;
+
+  --banner-success-bg: #c6ecdb;
+  --banner-success-text: #0d0a21;
+
+  --toast-error-icon: #f59a9a;
+
+  /* ===== Typography ===== */
+
+  --font-sans: "thmanyah sans", system-ui, sans-serif;
+
+  --font-display: "thmanyah serif display", "thmanyah sans", serif;
+
+  /* ===== Spacing ===== */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ===== Border Radius ===== */
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+}
+
+/* ==========================================
+   3. GLOBAL RESET
+========================================== */
+
 *,
 *::before,
 *::after {
@@ -5,7 +144,7 @@
 }
 
 html {
-  font-size: 100%; /* Respect browser default and user zoom */
+  font-size: 100%;
   direction: rtl;
   scroll-behavior: smooth;
 }
@@ -13,18 +152,25 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh; /* Fallback */
+  min-height: 100vh;
   min-height: 100dvh;
+
   font-family: var(--font-sans);
+
   background: var(--canvas);
   color: var(--ink);
+
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
-  min-height: 100vh; /* Fallback */
+  min-height: 100vh;
   min-height: 100dvh;
 }
+
+/* ==========================================
+   4. TYPOGRAPHY BASE
+========================================== */
 
 h1,
 h2,
@@ -40,9 +186,14 @@ p {
   margin-top: 0;
 }
 
+/* ==========================================
+   5. LINKS
+========================================== */
+
 a {
   color: var(--accent-text);
   text-decoration: none;
+
   transition: color 0.2s ease;
 }
 
@@ -50,10 +201,22 @@ a:hover {
   color: var(--accent-hover);
 }
 
+/* ==========================================
+   6. BUTTON RESET
+========================================== */
+
 button {
   font-family: inherit;
   cursor: pointer;
 }
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   7. FORM RESET
+========================================== */
 
 input,
 textarea,
@@ -62,13 +225,1270 @@ select {
   font-size: inherit;
 }
 
+/* ==========================================
+   8. MEDIA
+========================================== */
+
 img,
 video {
   max-width: 100%;
   height: auto;
 }
 
+/* ==========================================
+   9. ACCESSIBILITY
+========================================== */
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* ==========================================
+   10. REUSABLE COMPONENTS
+
+   We'll add approved Figma component
+   styles here during Foundation.
+
+========================================== */
+
+/* ==========================================
+   11. PAGE LAYOUTS
+
+   We'll add approved page layouts
+   here during Foundation.
+
+========================================== */
+
+/* ==========================================
+   12. RESPONSIVE DESIGN
+
+   Desktop first.
+   Mobile after Desktop approval.
+
+========================================== */
+
+/* ==========================================
+   UI COMPONENT: BUTTON
+========================================== */
+
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 48px;
+  padding: 0 24px;
+
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+/* Primary */
+
+.ui-button--primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* Accent */
+
+.ui-button--accent {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Secondary */
+
+.ui-button--secondary {
+  background: transparent;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Tertiary */
+
+.ui-button--tertiary {
+  background: transparent;
+  color: var(--accent);
+}
+
+/* Full Width */
+
+.ui-button--full {
+  width: 100%;
+}
+
+/* Disabled */
+
+.ui-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Loading Spinner */
+
+.ui-button__spinner {
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+
+  animation: button-spin 0.8s linear infinite;
+}
+
+@keyframes button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-button__spinner {
+    animation: none;
+  }
+}
+
+/* ==========================================
+   UI COMPONENT: AUTH FIELD
+========================================== */
+
+/* ===== Container ===== */
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  width: 100%;
+  min-width: 0;
+
+  font-family: var(--font-sans);
+  direction: rtl;
+}
+
+/* ===== Label ===== */
+
+.auth-field__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  color: var(--ink);
+  text-align: right;
+}
+
+/* ===== Input Container ===== */
+
+.auth-field__control {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 48px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  overflow: visible;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+/* ===== Input ===== */
+
+.auth-field__input {
+  flex: 1;
+
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+
+  padding: 0 12px;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: var(--ink);
+
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  text-align: start;
+}
+
+/* ===== Placeholder ===== */
+
+.auth-field__input::placeholder {
+  color: var(--ink-muted);
+  opacity: 1;
+}
+
+/* ===== Focus ===== */
+
+.auth-field__control:focus-within {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+/* ===== Error ===== */
+
+.auth-field--error .auth-field__control,
+.auth-field--error .auth-field__control:focus-within {
+  border: 2px solid var(--danger);
+  box-shadow: 0 0 0 4px var(--danger-ring);
+}
+
+.auth-field--error .auth-field__message {
+  color: var(--danger);
+}
+
+/* ===== Success ===== */
+
+.auth-field--success .auth-field__control {
+  background: var(--canvas);
+}
+
+.auth-field--success .auth-field__input {
+  color: var(--ink-muted);
+}
+
+/* ===== Disabled ===== */
+
+.auth-field--disabled .auth-field__control {
+  background: var(--canvas);
+  border-color: var(--line);
+}
+
+.auth-field--disabled .auth-field__input {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== Helper Message ===== */
+
+.auth-field__message {
+  margin: 0;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  color: var(--ink-muted);
+  text-align: right;
+}
+
+/* ===== Password ===== */
+
+.auth-field__input--password {
+  text-align: right;
+}
+
+.auth-field__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 44px;
+  height: 100%;
+
+  border: none;
+  background: transparent;
+
+  color: var(--ink-muted);
+
+  cursor: pointer;
+}
+
+.auth-field__toggle:hover {
+  color: var(--accent);
+}
+
+.auth-field__toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== Phone ===== */
+
+.auth-field__phone-prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  padding: 0 10px;
+
+  height: 24px;
+
+  direction: ltr;
+
+  border-right: 1px solid var(--line);
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: var(--ink);
+}
+
+.auth-field__control:has(.auth-field__phone-prefix) {
+  direction: ltr;
+}
+
+.auth-field__phone-prefix + .auth-field__input {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ==========================================
+   UI COMPONENT: INLINE MESSAGE
+========================================== */
+
+.inline-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  min-height: 32px;
+
+  padding: 8px 12px;
+
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  direction: rtl;
+}
+
+/* ===== Icon ===== */
+
+.inline-message__icon {
+  flex-shrink: 0;
+}
+
+/* ===== Text ===== */
+
+.inline-message__text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== Icon Left ===== */
+
+.inline-message--icon-left {
+  flex-direction: row-reverse;
+}
+
+/* ===== Error ===== */
+
+.inline-message--error {
+  background: var(--banner-error-bg);
+  color: var(--banner-error-text);
+}
+
+/* ===== Warning ===== */
+
+.inline-message--warning {
+  background: var(--banner-warning-bg);
+  color: var(--banner-warning-text);
+}
+
+/* ===== Info ===== */
+
+.inline-message--info {
+  background: var(--banner-info-bg);
+  color: var(--banner-info-text);
+}
+
+/* ===== Success ===== */
+
+.inline-message--success {
+  background: var(--banner-success-bg);
+  color: var(--banner-success-text);
+}
+
+/* ==========================================
+   UI COMPONENT: AVATAR OPTION
+========================================== */
+
+.avatar-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  position: relative;
+
+  width: 64px;
+
+  cursor: pointer;
+}
+
+/* Radio Input */
+
+.avatar-option__radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Avatar Circle */
+
+.avatar-option__circle {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 64px;
+  height: 64px;
+
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-pill);
+
+  transition: border-color 0.2s ease;
+}
+
+/* Avatar Image */
+
+.avatar-option__image {
+  width: 100%;
+  height: 100%;
+
+  padding: 4px;
+  object-fit: contain;
+
+  border-radius: 50%;
+}
+
+/* Selected Avatar */
+
+.avatar-option__radio:checked + .avatar-option__circle {
+  border: 3px solid var(--accent);
+}
+
+/* Check Icon */
+
+.avatar-option__check {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+
+  background: var(--accent);
+  color: var(--on-accent);
+
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  opacity: 0;
+}
+
+/* Show Check When Selected */
+
+.avatar-option__radio:checked + .avatar-option__circle .avatar-option__check {
+  opacity: 1;
+}
+
+/* Keyboard Focus */
+
+.avatar-option__radio:focus-visible + .avatar-option__circle {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Avatar Name */
+
+.avatar-option__name {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  color: var(--ink);
+  text-align: center;
+}
+
+/* ==========================================
+   UI COMPONENT: CHARACTER PICKER
+========================================== */
+
+.character-picker {
+  margin: 0;
+  padding: 0;
+
+  min-width: 0;
+  border: none;
+}
+
+/* Title */
+
+.character-picker__title {
+  margin-bottom: 8px;
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  color: var(--ink);
+}
+
+/* Avatar Options */
+
+.character-picker__options {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  gap: 16px;
+}
+
+/* Error Message */
+
+.character-picker__error {
+  margin: 8px 0 0;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  color: var(--danger);
+  text-align: right;
+}
+
+/* ==========================================
+   LAYOUT: AUTH NAVBAR
+========================================== */
+
+.auth-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 72px;
+  flex-shrink: 0;
+
+  padding: 0 32px;
+
+  background: var(--night);
+  direction: rtl;
+}
+
+/* Logo */
+
+.auth-navbar__logo {
+  display: block;
+
+  width: 46px;
+  height: 35px;
+
+  object-fit: contain;
+}
+
+/* Help Text */
+
+.auth-navbar__help {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  color: var(--on-panel-muted);
+}
+
+/* ==========================================
+   LAYOUT: AUTH PAGE
+========================================== */
+
+.auth-page {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: var(--canvas);
+}
+
+/* ==========================================
+   AUTH LAYOUT
+========================================== */
+
+.auth-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(360px, 560px);
+
+  flex: 1;
+  width: 100%;
+
+  direction: ltr;
+}
+
+/* ==========================================
+   FORM SECTION
+========================================== */
+
+.auth-layout__form {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  min-width: 0;
+
+  padding: 40px 24px;
+
+  background: var(--canvas);
+  direction: rtl;
+}
+
+.auth-layout__form-inner {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* ==========================================
+   PROMO SECTION
+========================================== */
+
+.auth-layout__promo {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 0;
+
+  background: var(--night);
+  color: var(--on-panel);
+
+  direction: rtl;
+  overflow: hidden;
+}
+
+/* ==========================================
+   LAYOUT: AUTH PROMO
+========================================== */
+
+.auth-promo {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+
+  padding: 0 64px;
+
+  background: var(--night);
+  color: var(--on-panel);
+
+  direction: rtl;
+  overflow: hidden;
+}
+
+/* ==========================================
+   AUTH SCENE
+========================================== */
+
+.auth-promo__scene {
+  position: relative;
+
+  width: 100%;
+  max-width: 432px;
+  aspect-ratio: 3 / 2;
+
+  background: var(--accent-soft);
+
+  border-radius: var(--radius-xl);
+
+  overflow: hidden;
+}
+
+.auth-promo__scene img,
+.auth-promo__scene video {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+/* ==========================================
+   PROMO CONTENT
+========================================== */
+
+.auth-promo__content {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 432px;
+
+  margin-top: 32px;
+
+  text-align: right;
+}
+
+/* ==========================================
+   PROMO TITLE
+========================================== */
+
+.auth-promo__title {
+  margin: 0 0 20px;
+
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 900;
+  line-height: 1.15;
+
+  color: var(--on-panel);
+}
+
+/* ==========================================
+   PROMO DESCRIPTION
+========================================== */
+
+.auth-promo__description {
+  margin: 0;
+
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  color: var(--on-panel-muted);
+
+  text-align: right;
+}
+
+/* ==========================================
+   BRAND PATTERN
+========================================== */
+
+.auth-promo__pattern {
+  position: absolute;
+
+  bottom: 72px;
+  left: 0;
+  right: 0;
+
+  width: 100%;
+  height: 280px;
+
+  background-image: url("../assets/images/tail-bands.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   FEATURE: REGISTER FORM
+========================================== */
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 440px;
+
+  direction: rtl;
+}
+
+/* Header */
+
+.register-form__header {
+  margin-bottom: 16px;
+}
+
+.register-form__title {
+  margin: 0 0 8px;
+
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1.15;
+
+  color: var(--ink);
+}
+
+.register-form__signin {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  color: var(--ink-muted);
+}
+
+.register-form__signin a {
+  font-weight: 700;
+  color: var(--accent-text);
+}
+
+/* Avatars */
+
+.register-form__avatars {
+  margin-bottom: 20px;
+}
+
+/* Fields */
+
+.register-form__fields {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  column-gap: 16px;
+  row-gap: 16px;
+}
+
+.register-form__field-full {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* Submit */
+
+.register-form__submit {
+  margin-top: 16px;
+}
+
+/* Footer */
+
+.register-form__footer {
+  margin: 16px 0 0;
+
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+/* ==========================================
+   UI COMPONENT: DEHM SCAN ANIMATION
+========================================== */
+
+.rc-scan {
+  --rc-navy: #1b1442;
+  --rc-purple: #4333a5;
+  --rc-mint: #c6ecdb;
+  --rc-ink-2: #b9b3e0;
+  --rc-dur: 5.6s;
+  position: relative;
+  width: 100%;
+  max-width: var(--rc-scan-max, 480px);
+  aspect-ratio: 3/2;
+  margin: 0;
+  container-type: inline-size;
+  font-family: "thmanyah sans", system-ui, Tahoma, sans-serif;
+}
+.rc-scan__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+}
+.rc-scan__svg g {
+  transform-box: view-box;
+}
+.hero .rc-scan {
+  --rc-scan-max: 560px;
+}
+
+/* pivots */
+.rc-scan__armReach {
+  transform-origin: 192px 174px;
+}
+.rc-scan__antenna {
+  transform-origin: 182px 125.6px;
+}
+.rc-scan__tag,
+.rc-scan__wave1,
+.rc-scan__wave2,
+.rc-scan__wave3 {
+  transform-origin: 274px 178px;
+}
+
+/* final frame (also shown when reduced motion is on) */
+.rc-scan__armRest {
+  opacity: 0;
+}
+.rc-scan__wave1,
+.rc-scan__wave2,
+.rc-scan__wave3 {
+  opacity: 0.25;
+}
+
+/* bubble */
+.rc-bubble {
+  position: absolute;
+  left: 40.83%;
+  top: 6.875%;
+  width: 50%;
+  height: 20%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0 0.9em;
+  border-radius: 1em;
+  font-size: 3.125cqw;
+  white-space: nowrap;
+  background: var(--rc-navy);
+  border: 1px solid var(--rc-purple);
+  color: #fff;
+  box-shadow: 0 0.6em 1.6em rgba(13, 10, 33, 0.35);
+  transform-origin: 24.6% 231%;
+}
+.rc-bubble::after {
+  content: "";
+  position: absolute;
+  left: calc(24.6% - 0.5em);
+  bottom: -0.7em;
+  border: 0.5em solid transparent;
+  border-top: 0.75em solid var(--rc-navy);
+  border-bottom: 0;
+}
+.rc-bubble__icon {
+  flex: 0 0 1.75em;
+  height: 1.75em;
+  border-radius: 50%;
+  background: var(--rc-mint);
+  color: var(--rc-navy);
+}
+.rc-bubble__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  line-height: 1.25;
+  text-align: right;
+}
+.rc-bubble__text strong {
+  font-size: 1em;
+  font-weight: 700;
+}
+.rc-bubble__text small {
+  font-size: 0.75em;
+  color: var(--rc-ink-2);
+}
+
+/* motion */
+@media (prefers-reduced-motion: no-preference) {
+  .rc-scan__armRest {
+    animation: rc-arm-rest var(--rc-dur) infinite;
+  }
+  .rc-scan__armReach {
+    animation: rc-arm-reach var(--rc-dur) infinite;
+  }
+  .rc-scan__wave1 {
+    animation: rc-ripple-1 var(--rc-dur) infinite;
+  }
+  .rc-scan__wave2 {
+    animation: rc-ripple-2 var(--rc-dur) infinite;
+  }
+  .rc-scan__wave3 {
+    animation: rc-ripple-3 var(--rc-dur) infinite;
+  }
+  .rc-scan__tag {
+    animation: rc-tag var(--rc-dur) infinite;
+  }
+  .rc-scan__antenna {
+    animation: rc-antenna var(--rc-dur) ease-in-out infinite;
+  }
+  .rc-bubble {
+    animation: rc-pop var(--rc-dur) infinite;
+  }
+  .rc-scan.is-paused *,
+  .rc-scan.is-paused {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes rc-arm-rest {
+  0%,
+  10.71% {
+    opacity: 1;
+  }
+  13.39%,
+  89.29% {
+    opacity: 0;
+  }
+  92.86%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes rc-arm-reach {
+  0% {
+    opacity: 0;
+    transform: rotate(55deg);
+  }
+  10.71% {
+    opacity: 0;
+    transform: rotate(55deg);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  13.39% {
+    opacity: 1;
+  }
+  19.64% {
+    opacity: 1;
+    transform: rotate(0) translateX(0);
+    animation-timing-function: ease-in-out;
+  }
+  21.07% {
+    transform: rotate(0) translateX(2px);
+  }
+  22.86% {
+    transform: rotate(0) translateX(0);
+  }
+  85.71% {
+    opacity: 1;
+    transform: rotate(0);
+    animation-timing-function: ease-in;
+  }
+  91.96%,
+  100% {
+    opacity: 0;
+    transform: rotate(55deg);
+  }
+}
+@keyframes rc-ripple-1 {
+  0%,
+  21.07% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  21.43% {
+    opacity: 1;
+    transform: scale(0.7);
+    animation-timing-function: ease-out;
+  }
+  30.89% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  31.25% {
+    opacity: 1;
+    transform: scale(0.7);
+    animation-timing-function: ease-out;
+  }
+  43.75% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  51.79% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  57.14%,
+  83.93% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  89.29% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+@keyframes rc-ripple-2 {
+  0%,
+  23.75% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  24.11% {
+    opacity: 1;
+    transform: scale(0.7);
+    animation-timing-function: ease-out;
+  }
+  33.57% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  33.93% {
+    opacity: 1;
+    transform: scale(0.7);
+    animation-timing-function: ease-out;
+  }
+  46.43% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  51.79% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  57.14%,
+  83.93% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  89.29% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+@keyframes rc-ripple-3 {
+  0%,
+  26.43% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  26.79% {
+    opacity: 1;
+    transform: scale(0.7);
+    animation-timing-function: ease-out;
+  }
+  36.25% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  36.61% {
+    opacity: 1;
+    transform: scale(0.7);
+    animation-timing-function: ease-out;
+  }
+  49.11% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  51.79% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  57.14%,
+  83.93% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  89.29% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+@keyframes rc-tag {
+  0%,
+  21.07% {
+    transform: scale(1);
+    animation-timing-function: ease-out;
+  }
+  23.21% {
+    transform: scale(1.14);
+  }
+  27.68%,
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes rc-antenna {
+  0%,
+  41.07% {
+    transform: rotate(0);
+  }
+  43.75% {
+    transform: rotate(-12deg);
+  }
+  46.43% {
+    transform: rotate(9deg);
+  }
+  49.11% {
+    transform: rotate(-5deg);
+  }
+  51.79%,
+  100% {
+    transform: rotate(0);
+  }
+}
+@keyframes rc-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  41.07% {
+    opacity: 0;
+    transform: scale(0.2);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  49.11%,
+  83.93% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  89.29% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
 }
