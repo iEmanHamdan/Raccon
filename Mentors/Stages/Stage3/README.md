@@ -10,7 +10,6 @@
   - [Admin Stories](#admin-stories)
 - [Figma Mockups](#figma-mockups)
 - [System Architecture](#system-architecture)
-- [Data Model and Relationships](#data-model-and-relationships)
 - [High-Level Class Diagram](#high-level-class-diagram)
 - [High-Level Sequence Diagrams](#high-level-sequence-diagrams)
 - [Raccon REST API Documentation](#raccon-rest-api-documentation)
@@ -33,7 +32,7 @@ Raccon is an NFC-enabled platform for creating and playing physical, tag-based e
 | **Event tag** | Event-specific configuration for one physical tag, stored as JSONB. | `event_tags` |
 | **Journey** | Player-facing tag scan operation for an active event. | `POST /journey/scan` |
 | **`static_hash`** | Random, unique, public tag identifier, not the tag sequence number. | `tags.static_hash` |
-| **Injected user identifier** | User UUID submitted by the client with the scan; must equal the authenticated JWT subject. | `injected_user_hash` request field. |
+| **`user_hash`** | Unique, randomly generated 8-character string assigned to each user to help prevent unauthorized access through shared NFC tag links. | `users.user_hash` |
 
 ### Event lifecycle
 
@@ -50,13 +49,13 @@ Owners are identified by `packs.owner_id`; an event inherits ownership through i
 
 ## User Stories
 
-The user stories below specify the complete intended Raccon experience. **Packs** are admin-generated physical inventory, while **events** are created when customers claim packs and are subsequently configured and managed by their owners.
+The user stories below specify the complete intended Raccon experience. **Packs** are admin-generated physical inventory, while **events** are created when customers claim packs and are subsequently configured and managed by their owners. The user stories are prioritized according to the [MoSCoW prioritization table](../stage2/README.md), which establishes the relative importance of each feature.
 
 ## Owner Stories
 
 ### US-01: Registration
 
-**Category:** Owner &nbsp; · &nbsp; **Priority:** High
+**Category:** Owner/Player &nbsp; · &nbsp; **Priority:** High
 
 **User story**
 
@@ -77,14 +76,15 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - The system should validate the format of the entered fields.
 - The system should prevent registration until all mandatory fields contain valid values.
 - Validation errors should be displayed clearly under the relevant field in red.
-- After successful registration, the user should be signed in.
 - The created account should be identifiable by the system as an owner or player according to the actions available to that user.
+- After successful registration, the owner should be redirected to the Raccon platform.
+- After successful registration, the player should be redirected to the NFC experience they were attempting to access.
 
 ---
 
 ### US-02: Log In
 
-**Category:** Owner &nbsp; · &nbsp; **Priority:** High
+**Category:** Owner/Player &nbsp; · &nbsp; **Priority:** High
 
 **User story**
 
@@ -125,7 +125,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 
 ### US-04: Forgot Password
 
-**Category:** Owner &nbsp; · &nbsp; **Priority:** High
+**Category:** Owner/Player &nbsp; · &nbsp; **Priority:** High
 
 **User story**
 
@@ -163,7 +163,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 **Acceptance criteria**
 
 - The user should be able to view their profile information.
-- The user should be able to edit their username.
+- The user should be able to edit their name, username, phone number or avatar.
 - The user should be able to save changes to their profile information.
 - The system should display a confirmation message after successfully saving profile changes.
 - The user should be able to change their password.
@@ -184,6 +184,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 > As a registered user,
 > I want to claim a package I purchased,
 > So I can securely access my package and customize its experience.
+
 **Acceptance Criteria**
 
 - The user shall be able to view the available NFC pack options on the Raccon platform.
@@ -196,7 +197,6 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - When the customer confirms, the React frontend shall send an **authenticated HTTP POST request** to the FastAPI endpoint `POST /packs/claim`, including the authorization token in the JSON request body and the customer's JWT in the authorization header.
 - The backend shall validate the authorization token and verify that the pack has not already been claimed.
 - If the claim is valid, the system shall assign the pack to the authenticated customer and create exactly one event with the initial status `draft`.
-- Pack ownership assignment and event creation shall succeed or fail atomically.
 - If the token is invalid or already used, the system shall reject the claim and display an appropriate error message without changing pack ownership or creating an event.
 - A pack that has already been claimed shall not be claimable by another account.
 - After a successful claim, the event shall appear in the customer's owned events list.
@@ -236,7 +236,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - Previously saved event configurations should remain available when the owner returns to the event.
 - `GET /events` should list the owner’s events; `GET /events/{event_id}` should provide the selected event’s configuration details.
 - `PATCH /events/{event_id}` should update the event title and control status changes, including transition to `live`.
-- Event lifecycle values should be `draft`, `paused`, and `live`; scans should be accepted only while `live`.
+
 
 ---
 
@@ -327,8 +327,7 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - When one edit remains, the system should warn the owner before saving that this will use the event's final edit.
 - Once all three event edits have been used, the event configuration should become read-only.
 - The Event Title should remain editable even when no customization edits remain.
-- The edit allowance belongs to the event as a whole; `PUT /events/{event_id}/setup` is the configuration persistence operation.
-- Event title changes through `PATCH /events/{event_id}` should remain independent of the customization edit allowance.
+
 
 ---
 
@@ -513,7 +512,6 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - If neither text nor an image is configured, the scan result should still display the relevant tag information.
 - If Tags Left is enabled, the number of remaining tags should be displayed.
 - If Tags Left is disabled, this information should not be displayed.
-- If Timer is enabled, the time left should be displayed.
 - The player's progress should be updated.
 - The player should be able to access the sequential leaderboard from the scan-result interface.
 
@@ -542,7 +540,6 @@ The user stories below specify the complete intended Raccon experience. **Packs*
 - The player should be able to see their current score.
 - If Tags Left is enabled, the number of remaining tags should be displayed.
 - If Tags Left is disabled, this information should not be displayed.
-- If Timer is enabled, the time left should be displayed.
 - The player's score should be updated.
 - The player should be able to access the open hunt leaderboard from the scan-result interface.
 
@@ -670,7 +667,7 @@ flowchart TB
     React["React frontend / routing / API client"]
     API["FastAPI: auth, users, admin, packs, events, journey"]
     JWT["JWT authentication and role checks"]
-    DB[("PostgreSQL: users, packs, tags, events, event_tags")]
+    DB[("PostgreSQL: users, packs, tags, events, event_tags, journey_progress")]
     Admin --> React
     Owner --> React
     Store -.->|"Master authorization link"| Owner
@@ -687,7 +684,7 @@ flowchart TB
 | Presentation | React (project frontend) | Owner and player screens, tag-link routing, factory interface, request composition |
 | API | FastAPI, Pydantic | Request validation, authentication, authorization, event lifecycle, tag scanning |
 | Data access | SQLModel / SQLAlchemy | Models, queries, and transactional persistence |
-| Database | PostgreSQL | Durable users, packs, tags, events, and JSONB event-specific tag content |
+| Database | PostgreSQL | Users, packs, tags, events, and JSONB event-specific tag content |
 | Migrations | Alembic | Versioned relational schema evolution |
 | External systems | Ramz , NFC writing station | Purchase handoff and physical tag programming |
 
@@ -702,110 +699,87 @@ flowchart TB
 6. A player opens an NFC link; the frontend submits the unique tag hash and authenticated user's UUID to the journey scan endpoint.
 7. FastAPI checks the JWT user identity, resolves the physical tag, selects the event for the pack, verifies `live` status, and returns content.
 
-## Data Model and Relationships
-
-Raccon separates physical inventory from event configuration. A pack is created by an administrator, contains physical tags, and can be claimed once. Claiming creates exactly one event. Starting a new round **does not** create a new event: the event's `record` JSONB stores the complete history of current and previous rounds, including players, scans, claims, scores, trap effects, and final results.
-
-| Table | Important fields | Constraints and responsibility |
-|---|---|---|
-| `users` | `id: UUID`, `name`, `username`, `email`, `phone_number`, `password`, `role` | UUID primary key; unique username and email; `password` stores a password hash; `role` distinguishes admins |
-| `packs` | `id: UUID`, `owner_id: UUID?`, `mode`, `tags_count`, `master_auth_hash` | Nullable owner; positive tag count; unique single-use claim credential; store a verifier in the target security design |
-| `tags` | `id: UUID`, `pack_id: UUID`, `static_hash`, `sequence_num`, `is_printed` | Unique opaque NFC token; unique `(pack_id, sequence_num)`; factory programming state |
-| `events` | `id: UUID`, `pack_id: UUID`, `title`, `status`, `edits_used`, `record: JSONB` | `UNIQUE(pack_id)`; `edits_used` from 0 to 3; `record` stores all round data |
-| `event_tags` | `id: UUID`, `event_id: UUID`, `tag_id: UUID`, `tag_type`, `content: JSONB` | Unique `(event_id, tag_id)`; tag must belong to the event's pack |
-
-
 
 ### Entity Relationship Diagram
 
 ```mermaid
 erDiagram
-    USERS |o--o{ PACKS : owns
-    PACKS ||--|{ TAGS : contains
-    PACKS ||--o| EVENTS : has
-    EVENTS ||--o{ EVENT_TAGS : configures
-    TAGS ||--o| EVENT_TAGS : referenced_by
-    USERS {
-        UUID id PK
+    users |o--o{ packs : owns
+    packs ||--o{ tags : contains
+    packs ||--o{ events : has
+    events ||--o{ event_tags : includes
+    tags ||--o{ event_tags : configured_as
+    events ||--o{ journey_progress : tracks
+    users ||--o{ journey_progress : participates_in
+    users |o--o{ event_tags : claims
+
+    users {
+        uuid id PK
+        string user_hash UK
         string name
         string username UK
         string email UK
         string phone_number
-        string password
-        string role
+        string password "hashed"
+        string role "default: user"
+        int avatar_id "default: 1"
     }
-    PACKS {
-        UUID id PK
-        UUID owner_id FK "nullable"
-        string mode
+
+    packs {
+        uuid id PK
+        uuid owner_id FK "nullable"
+        string mode "open or seq"
         int tags_count
-        string master_auth_hash UK "credential verifier"
+        string master_auth_hash UK
     }
-    TAGS {
-        UUID id PK
-        UUID pack_id FK
+
+    tags {
+        uuid id PK
+        uuid pack_id FK
         string static_hash UK
         int sequence_num
-        boolean is_printed
+        boolean is_printed "default: false"
     }
-    EVENTS {
-        UUID id PK
-        UUID pack_id FK,UK
-        string title
-        string status
-        int edits_used
-        JSONB record "all rounds and event history"
+
+    events {
+        uuid id PK
+        uuid pack_id FK
+        string title "default: untitled"
+        string status "default: pending"
+        int edits_used "default: 0"
+        boolean hashing_enabled 
+        boolean tags_left_enabled
     }
-    EVENT_TAGS {
-        UUID id PK
-        UUID event_id FK
-        UUID tag_id FK
-        string tag_type
-        JSONB content
+
+    event_tags {
+        uuid id PK
+        uuid event_id FK
+        uuid tag_id FK
+        string tag_type "default: clue"
+        jsonb content
+    }
+
+    journey_progress {
+        uuid id PK
+        uuid event_id FK
+        string user_hash "indexed"
+        int current_sequence "default: 0"
+        int score "default: 0"
+        string status "default: active"
+        datetime frozen_until "nullable"
+        jsonb visited_sequences
     }
 ```
+### Database Overview
 
-### Event Record JSONB Structure
-
-Scan entries are append-only within their round.
-
-```json
-{
-  "rounds": [
-    {
-      "round_id": "00000000-0000-4000-8000-000000000101",
-      "status": "live",
-      "started_at": "2026-10-13T10:00:00Z",
-      "ended_at": null,
-      "players": {
-        "00000000-0000-4000-8000-000000000001": {
-          "score": 1,
-          "highest_sequential_tag": 0,
-          "frozen_until": null,
-          "last_successful_tag_id": "00000000-0000-4000-8000-000000000011"
-        }
-      },
-      "claims": {
-        "00000000-0000-4000-8000-000000000011": "00000000-0000-4000-8000-000000000001"
-      },
-      "choose_traps": {},
-      "scans": [
-        {
-          "scan_id": "00000000-0000-4000-8000-000000000102",
-          "player_id": "00000000-0000-4000-8000-000000000001",
-          "tag_id": "00000000-0000-4000-8000-000000000011",
-          "result": "claimed",
-          "points_delta": 1,
-          "scanned_at": "2026-10-13T10:01:00Z"
-        }
-      ],
-      "final_leaderboard": null
-    }
-  ]
-}
-```
-
-The API derives the current leaderboard and play state from the active round in `record`. When a round ends, its final leaderboard is stored within that round. The complete history remains in the same event row.
+| Table | Responsibility |
+|---|---|
+| `users` | Stores user credentials, profile information, selected avatars, and account roles. |
+| `packs` | Stores generated NFC packages, ownership information, gameplay modes, and claiming credentials. |
+| `tags` | Stores physical NFC tag identifiers, sequence numbers, and programming status. |
+| `events` | Stores event configurations, editing limits, and event-level settings such as NFC tag hashing. |
+| `event_tags` | Stores event-specific NFC tag content and trap configurations using JSONB. |
+| `journey_progress` | Tracks individual player progress, scores, visited tags, gameplay status, and active trap effects within an event. |
 
 ## High-Level Class Diagram
 
@@ -813,13 +787,19 @@ The API derives the current leaderboard and play state from the active round in 
 ```mermaid
 classDiagram
     direction TB
+
     class User {
         +UUID id
+        +string user_hash
+        +string name
         +string username
         +string email
+        +string phone_number
         +string password
         +string role
+        +int avatar_id
     }
+
     class Pack {
         +UUID id
         +UUID? owner_id
@@ -827,6 +807,7 @@ classDiagram
         +int tags_count
         +string master_auth_hash
     }
+
     class Tag {
         +UUID id
         +UUID pack_id
@@ -834,6 +815,7 @@ classDiagram
         +int sequence_num
         +bool is_printed
     }
+
     class Event {
         +UUID id
         +UUID pack_id
@@ -842,6 +824,7 @@ classDiagram
         +int edits_used
         +JSONB record
     }
+
     class EventTag {
         +UUID id
         +UUID event_id
@@ -849,38 +832,46 @@ classDiagram
         +string tag_type
         +JSONB content
     }
+
     class AdminService {
         +generatePacks()
         +markTagPrinted()
     }
+
     class PackService {
         +previewPack()
         +claimPackAtomically()
     }
+
     class EventService {
+        +createEvent()
         +setupEvent()
         +openEditingSession()
         +saveEditingSession()
         +startRound()
         +endRound()
     }
+
     class JourneyService {
         +validateScan()
         +applyScanAtomically()
         +applyTrap()
     }
+
     class LeaderboardService {
         +getCurrentStandings()
         +getPlayerState()
     }
+
     User "0..1" <-- "0..*" Pack : owns
     Pack "1" <-- "1..*" Tag : contains
-    Pack "1" <-- "0..1" Event : has
+    Pack "1" <-- "0..*" Event : has
     Event "1" <-- "0..*" EventTag : configures
-    Tag "1" <-- "0..1" EventTag : configured_as
+    Tag "1" <-- "0..*" EventTag : configured_as
+
     AdminService ..> Pack : generates
-    PackService ..> Event : creates_once
-    EventService ..> Event : updates
+    PackService ..> Pack : claims
+    EventService ..> Event : creates_and_updates
     JourneyService ..> Event : locks_and_updates_record
     JourneyService ..> EventTag : reads_configuration
     LeaderboardService ..> Event : reads_record
@@ -890,41 +881,13 @@ classDiagram
 
 | Class | Responsibility |
 |---|---|
-| `User`, `Pack`, `Tag`, `Event`, `EventTag` | Persisted PostgreSQL entities |
-| `AdminService`, `PackService` | Factory inventory, token redemption, and atomic pack claiming |
-| `EventService` | Event setup, editing quotas, lifecycle, and round start/end |
-| `JourneyService` | Sequential ordering, first claims, scores, traps, and atomic record updates |
-| `LeaderboardService` | Read current-round scores and progress from `events.record` |
+| `User`, `Pack`, `Tag`, `Event`, `EventTag` | Persisted PostgreSQL entities representing accounts, physical inventory, and event configurations. |
+| `AdminService`, `PackService` | Package generation, factory programming, and secure package claiming. |
+| `EventService` | Event creation, configuration, editing limits, and round lifecycle management. |
+| `JourneyService` | NFC scan validation, Sequential progression, Open Hunt claims, scores, traps, and atomic gameplay updates. |
+| `LeaderboardService` | Retrieves current-round rankings, scores, and player progress from `events.record`. |
 
-### Event Tag JSONB Shape
 
-The `event_tags.content` JSONB payload follows the `TagContent` fields `hint`, `image`, `boom`, `freeze`, and `choose`. The owner submits `tag_type` separately (`clue` or `trap`). Examples:
-
-**Clue**
-
-```json
-{"hint":"Look behind the red door","image":"r2://raccon-media/events/example/clue.webp"}
-```
-
-**Freeze**
-
-```json
-{"freeze":60}
-```
-
-**Boom**
-
-```json
-{"boom":1}
-```
-
-**Choose**
-
-```json
-{"choose":true}
-```
-
-Clue image files reside in Cloudflare R2; PostgreSQL stores their references, not the binary files. 
 
 ## High-Level Sequence Diagrams
 
@@ -1218,7 +1181,6 @@ sequenceDiagram
 | `POST` | `/auth/forgot-password` | Public | Begin password recovery |
 | `POST` | `/auth/reset-password` | Public | Finish password recovery |
 | `GET` | `/events/{event_id}/leaderboard` | User | Leaderboard |
-| `GET` | `/events/{event_id}/play-state` | User | Participation/progress |
 | `POST` | `/journey/set-trap` | User | Confirm a persistent Choose Trap selection |
 | `POST` | `/events/{event_id}/editing-session` | Owner | Explicitly open a configuration editing session |
 | `POST` | `/events/{event_id}/images` | Owner | Upload a tag image to Cloudflare R2 |
@@ -1233,7 +1195,7 @@ The API specification is divided into **internal APIs**, which support Raccon's 
 
 | Endpoint | Access | Request | Successful response | Validation and important behavior |
 |---|---|---|---|---|
-| `POST /auth/register` | Public | JSON: `name`, `username`, `email`, `phone_number`, `password` | `200`: `message`, `user_id` (UUID) | Username `^[a-z0-9_]+$`; phone `^\d{9}$`; password max 72 characters; duplicate username/email: `400`. Uniqueness is enforced by the database. |
+| `POST /auth/register` | Public | JSON: `name`, `username`, `email`, `phone_number`, `avatar_id`, `password` | `200`: `message`, `user_id` (UUID) | Username `^[a-z0-9_]+$`; phone `^\d{9}$`; password max 72 characters; duplicate username/email: `400`. Uniqueness is enforced by the database. |
 | `POST /auth/login` | Public | Form: `username`, `password`; username field accepts a username or email | `200`: `access_token`, `token_type: "bearer"` | Invalid credentials: `400`. The access token is a JWT. |
 | `POST /auth/logout` | Authenticated user | Bearer JWT; no body | `200`: `{"message":"Successfully logged out."}` | The frontend discards the JWT; logout does not revoke an already issued access token. |
 | `POST /auth/change-password` | Authenticated user | JSON: `old_password`, `new_password` | `200`: `{"message":"Password changed successfully"}` | Incorrect current password: `400`; enforce password validation. |
@@ -1280,52 +1242,16 @@ The customer follows a Ramz-provided link to the **React frontend** at `GET http
 | `PATCH /events/{event_id}` | Pack owner | JSON: optional `title`, `status` | `200`: updated `id`, `pack_id`, `title`, `status` | `draft → paused` occurs through setup; owner controls allow `paused ↔ live`; never return to `draft`. Cannot start without valid configuration. Title changes do not consume an editing session. Unknown: `404`; non-owner: `403`; invalid status: `422`. |
 | `POST /events/{event_id}/editing-session` | Event owner | Path: `event_id` (UUID) | `200`: `editing_session_id` (UUID), `edits_remaining` | After initial setup, explicitly opens a session. First successful changed save in the session consumes one of three edits; repeated/no-op saves do not. Session ID accompanies setup submissions. Quota exhausted: `409`. Opening an editing session while `live` is rejected; the owner must end the round and return to `paused` before editing. |
 
-**Setup request example:**
 
-```json
-{
-  "tags_config": [
-    {"tag_id":"00000000-0000-4000-8000-000000000011","tag_type":"clue","content":{"hint":"Find the next tag","image":"r2://raccon-media/events/example/hint.webp"}},
-    {"tag_id":"00000000-0000-4000-8000-000000000012","tag_type":"trap","content":{"freeze":60}}
-  ]
-}
-```
 
-**Round lifecycle:** The **ابدأ الجولة** control changes `paused → live`, starting a new round with reset scores, claims, and progress. The **انهاء الجولة** control changes `live → paused`, finalizing the round and leaderboard. All round data remains in `events.record` (JSONB). Saving event configuration while `live` is rejected; editing and saving are permitted only while `paused` (or during initial setup in `draft`). The `PUT` setup behavior remains full replacement.
 
 ### 1.5 Player journey and Event
 
 | Endpoint | Access | Request | Successful response | Validation and important behavior |
 |---|---|---|---|---|
-| `POST /journey/scan` | Authenticated player | JSON: `tag_hash`, `injected_user_hash` (UUID) | `200`: scan outcome and tag information; event contract includes `result`, `tag_sequence`, `tag_type`, `content`, `round_id`, `points_delta`, `score`, `highest_sequential_tag`, `claimed`, `frozen_until`, `tags_left`, `time_remaining_seconds` | Injected UUID must equal JWT subject (`403` otherwise); unknown hash: `404`; missing event or non-live status: `400`. JWT authenticates identity; supplied UUID does **not** prove physical NFC tapping. Event state updates must be atomic. |
+| `POST /journey/scan` | Authenticated player | JSON: `tag_hash`, `injected_user_hash` (UUID) | `200`: scan outcome and tag information; event contract includes `result`, `tag_sequence`, `tag_type`, `content`, `round_id`, `points_delta`, `score`, `highest_sequential_tag`, `claimed`, `frozen_until`, `tags_left`, `time_remaining_seconds` | Injected UUID must equal JWT subject (`403` otherwise); unknown hash: `404`; missing event or non-live status: `400`. JWT authenticates identity; supplied UUID does **not** prove physical NFC tapping. |
 | `GET /events/{event_id}/leaderboard` | Authenticated event player | Path: `event_id` | `200`: `round_id`, mode, ranked `players` (UUID, display name, score/progress), caller's rank | Current-round ranking derived from `events.record`. Open Hunt: first-claim points minus Boom penalties; Sequential: highest consecutive tag. |
-| `GET /events/{event_id}/play-state` | Authenticated event player | Path: `event_id` | `200`: `round_id`, `event_status`, `score`, `highest_sequential_tag`, `frozen_until`, optional `tags_left`, `time_remaining_seconds` | Derived from `events.record`; unknown event: `404`; unauthorized: `403`. |
 | `POST /journey/set-trap` | Authenticated event player | JSON: `tag_id`, `trap_type` (`freeze` or `boom`), `duration_seconds` for Freeze | `200`: confirmed selection and `round_id` | Live Open Hunt round; tag must be configured as `choose`. Selection applies immediately and persists until replaced. Chooser is not immune. Freeze: 30–180 seconds in steps of 30; Boom: minus one point, floor zero. Exact immediate recipient set remains an event decision. Transactional update. |
-
-**Scan request example:**
-
-```json
-{"tag_hash":"R7bX4k","injected_user_hash":"00000000-0000-4000-8000-000000000001"}
-```
-
-**Open Hunt successful-claim response example:**
-
-```json
-{
-  "result":"claimed",
-  "tag_sequence":1,
-  "tag_type":"clue",
-  "content":{"hint":"Find the next tag","image":null},
-  "round_id":"00000000-0000-4000-8000-000000000101",
-  "points_delta":1,
-  "score":1,
-  "highest_sequential_tag":null,
-  "claimed":true,
-  "frozen_until":null,
-  "tags_left":19,
-  "time_remaining_seconds":null
-}
-```
 
 
 
@@ -1333,8 +1259,8 @@ The customer follows a Ramz-provided link to the **React frontend** at `GET http
 
 | Endpoint | Access | Request | Successful response | Validation and important behavior |
 |---|---|---|---|---|
-| `POST /auth/forgot-password` | Public | JSON: `email` | Confirmation response, identical whether the account exists or not | For an existing account, send a short-lived, single-use reset token out of band; avoid account enumeration. |
-| `POST /auth/reset-password` | Public | JSON: `reset_token`, `new_password`, `confirm_password` | Confirmation of password change | Verify token expiration, matching passwords, and password rules; consume token atomically; do not log secrets. |
+| `POST /auth/forgot-password` | Public | JSON: `email` | Confirmation response, identical whether the account exists or not | For an existing account, send a short-lived, single-use reset token. |
+| `POST /auth/reset-password` | Public | JSON: `reset_token`, `new_password` | Confirmation of password change | Verify token expiration, matching passwords, and password rules. |
 
 ### 1.7 Service health and documentation
 
@@ -1344,7 +1270,7 @@ The customer follows a Ramz-provided link to the **React frontend** at `GET http
 | `GET /health/` | Public | `200`: `{"status":"ok","message":"Raccon APIs is running!"}` | Health check. |
 | `GET /scalar` | Public or deployment-restricted | Scalar documentation page | Interactive API documentation; FastAPI also provides standard OpenAPI routes. |
 
-**Response conventions:** Successful requests use the response shape specified for each endpoint. Validation errors may use FastAPI's structured `detail` array rather than a single string; error handling should preserve a consistent client-facing convention. Authorization failures use `401` for missing/invalid authentication and `403` for forbidden operations where applicable. `404` indicates an unknown resource; `409` may indicate a conflict such as an exhausted editing quota or an already redeemed claim. Exact error schemas and conflict codes should be finalized consistently across routes.
+
 
 ## 2. External APIs and Services
 
@@ -1370,11 +1296,12 @@ PostgreSQL provides durable relational integrity for ownership and tag associati
 
 Alembic records schema changes as versioned migrations, making development and deployment reproducible. The migration strategy covers users, roles, packs, tags, events, event tags, and tag printing fields. Schema migration execution should be part of deployment rather than relying solely on runtime table creation.
 
-### Unique NFC identifiers and security
+### Unique NFC Identifiers and Security
 
 Tag URLs use `https://raccon.link/t/{static_hash}`, not a sequence number or database UUID. A cryptographically secure random generator creates a unique six-character alphanumeric token for each tag, independently of its sequence number. This conceals the sequence number but is not encryption and does not guarantee resistance to brute-force guessing. The token is a public identifier, not proof of a physical tap.
 
-The journey endpoint compares the client-submitted UUID with the authenticated JWT's user UUID. This blocks submissions claiming a different user identity, but a client that knows its own UUID can still reproduce its own scan request; it does not prove physical NFC contact. Access to non-live events is denied by the API.
+
+The journey endpoint verifies the authenticated user's identity using their JWT and ensures that gameplay requests are associated with the correct user. If a user UUID is submitted by the client, it must match the authenticated JWT's user UUID. This prevents impersonation through a different user identifier, but it does not prove physical NFC contact. Access to non-live events is denied by the API.
 
 ### Separate platform and NFC domains
 
@@ -1398,7 +1325,6 @@ The `draft` → `paused` ↔ `live` workflow separates unconfigured events, conf
 | US-07–US-10 | `/events`, `/events/{event_id}`, `/events/{event_id}/setup` | Editing quota, media upload, UI constraints |
 | US-11–US-13 | `EventTag.content` schema, setup endpoint | Trap execution and placement |
 | US-14–US-15 | Tag/event read endpoints | Frontend previews |
-| US-16 | `/journey/scan` | Opaque links do not prove physical presence |
 | US-17–US-20 | Mode/sequence fields and scan response | Participation, scoring, trap runtime |
 | US-21 | `/events/{event_id}/leaderboard` | Leaderboard derived from `events.record`, rankings and tie-breaking |
 | US-22 | `/admin/generate-packs`, `/admin/factory/*` | Hardware writing/locking verification |
@@ -1409,74 +1335,97 @@ The following plans define the Source Control Management (SCM) strategy and Qual
 
 ### Source Control Management (SCM) Strategy
 
-We utilize **GitHub** as our centralized version control system, following a structured branching model to isolate feature development from production-ready code.
+We use **GitHub** as our centralized version control system, following a structured branching model to isolate feature development from production-ready code.
 
 #### Branching Strategy
 
-Our repository follows a conceptual workflow that keeps production code safe while allowing parallel development:
+Our repository follows a branching workflow that protects production code while supporting parallel development:
 
-- **Production State:** A `main` branch represents the stable, live state of the application. Code is only merged here after testing and approval.
-- **Integration/Development State:** A `dev` branch acts as the staging ground. New features and regular bug fixes are merged here for pre-production testing and team synchronization.
-- **Task/Feature Branches:** Developers create temporary branches from the `dev` branch for specific features, tasks, or non-critical bug fixes. Completed and tested work is merged back through a pull request.
-- **Emergency Patch Branches:** For critical production bugs, temporary branches are created directly from the `main` branch. Fixes are then synchronized across all active environments to maintain consistency.
+- **Production (`main`):** Contains stable, production-ready code. Changes are merged only after testing and approval.
+- **Development (`dev`):** Serves as the integration branch for new features and bug fixes before production release.
+- **Feature Branches:** Created from `dev` for individual features, tasks, or non-critical bug fixes. Completed work is merged into `dev` through pull requests.
+- **Hotfix Branches:** Created from `main` to resolve critical production issues. Fixes are merged back into `main` and synchronized with `dev`.
 
 #### Commit Conventions
 
-Commit messages must describe the change and use a consistent prefix to support readable history and automated changelogs:
+We follow consistent commit message prefixes to maintain a readable Git history:
 
-- `feat: [description]` — New features.
-- `fix: [description]` — Bug fixes.
-- `refactor: [description]` — Code changes that neither fix a bug nor add a feature.
-- `chore: [description]` — Routine tasks, dependency updates, or configuration changes.
+| Prefix | Purpose |
+|---|---|
+| `feat:` | Introduce a new feature. |
+| `fix:` | Resolve a bug. |
+| `refactor:` | Improve code structure without changing functionality. |
+| `chore:` | Perform maintenance, dependency updates, or configuration changes. |
 
 #### Pull Request Workflow
 
-Direct commits to the `main` and `dev` branches are restricted. All changes must follow this pull request process:
+Direct commits to `main` and `dev` are restricted. All changes follow this process:
 
-1. **Open a PR:** Target the appropriate `dev` or `main` branch based on the task type.
-2. **Pass CI Checks:** All required automated GitHub Actions checks, including linting and testing, must pass.
-3. **Obtain Peer Review:** At least one team member must review and approve the PR.
-4. **Squash and Merge:** Commits are squashed when merging to keep the repository history clear and readable.
+1. **Open a PR:** Target `dev` for features and regular fixes, or `main` for approved releases and critical hotfixes.
+2. **Pass CI Checks:** All required GitHub Actions checks, including linting and testing, must pass.
+3. **Obtain Peer Review:** At least one team member must review and approve the pull request.
+4. **Squash and Merge:** Commits are squashed to maintain a clean and readable repository history.
 
 #### Project Management (Trello)
 
-We use **Trello** to manage project tasks, organize development activities, track progress, and coordinate work across the team.
+We follow the **Agile methodology**, organizing development into sprints to support iterative development and team collaboration. We use **Trello** to manage tasks and track progress through five card categories:
+
+| Category | Purpose |
+|---|---|
+| **Backlog** | Tasks and features awaiting development. |
+| **In Dev** | Tasks currently being implemented. |
+| **Merged** | Completed code changes merged into the development branch. |
+| **Done** | Tasks that have been completed and verified. |
+| **Bugs** | Reported issues requiring investigation or fixes. |
 
 - **Trello Board:** [Raccon Project Board](https://trello.com/invite/b/6ac06add5461463aafee2998/ATTIe0efc74142944a0e5543ee80f3387fe624BD55D9/raccon)
 
 ### Quality Assurance (QA) and CI/CD Plan
 
-Quality Assurance is integrated into the SCM workflow through **GitHub Actions**. Automated checks validate code before it reaches staging or production.
+Quality Assurance is integrated into the SCM workflow through **GitHub Actions**, which automatically validates code before it reaches staging or production.
 
 #### Testing Strategy
 
-Our QA approach includes three primary layers:
+Raccon uses automated testing to validate the **FastAPI backend, React frontend, PostgreSQL database, and Alembic migrations**.
 
-- **Static Analysis and Linting:** Maintain code style consistency and catch issues early using automated tools such as Ruff, Black, and ESLint.
-- **Unit Testing:** Test individual functions, database models, and utility scripts in isolation to verify core logic.
-- **Integration Testing:** Validate interactions between system components, including API endpoint responses and database transactions, using a dedicated test database.
-- **Migration Testing (Alembic):** Apply migrations to a clean PostgreSQL test database and upgrade from the previous schema; verify unique constraints, JSONB columns, and schema compatibility before deployment.
+| Testing Type | Tools | Scope |
+|---|---|---|
+| **Linting & Formatting** | `pycodestyle`, Black, ESLint | PEP 8 compliance, Python formatting, React code quality, and unused variables. |
+| **Unit Testing** | `pytest` | Authentication, token generation, package creation, editing limits, scan validation, scoring, and trap logic. |
+| **Integration Testing** | `pytest`, FastAPI `TestClient`, PostgreSQL | API responses, JWT authentication, database transactions, package claiming, concurrent scans, and authorization. |
+| **Migration Testing** | Alembic, PostgreSQL | Migration execution, foreign keys, unique constraints, JSONB columns, and schema consistency. |
+
+
 
 #### Continuous Integration (CI)
 
-The GitHub Actions CI pipeline runs automatically on pushes and pull requests targeting the `main` and `dev` branches. It performs the following steps:
+GitHub Actions automatically runs CI on **pushes to `dev` and `main`, and pull requests targeting either branch**, using `.github/workflows/ci.yml`.
 
-1. **Environment Setup:** Check out the code and configure the required runtime environments, such as Python and Node.js.
-2. **Dependency Installation:** Install the application's required packages.
-3. **Linting and Formatting Checks:** Run code quality tools. Checks fail when the code does not meet formatting standards.
-4. **Test Execution:** Run the automated test suite. Failed required checks block the PR from merging.
-5. **Alembic Migration Checks:** Verify the migration chain and run `alembic upgrade head` against a disposable PostgreSQL database; review generated revisions before merging.
-6. **Build Verification:** Build the application containers, such as Docker images, to identify build and packaging issues before deployment.
+| CI Job | Implementation |
+|---|---|
+| **Environment Setup** | `actions/checkout`, `actions/setup-python`, `actions/setup-node`; install dependencies using `pip` and `npm ci`. |
+| **Backend Linting** | Run `pycodestyle` and `black --check` to enforce Python code standards. |
+| **Frontend Linting** | Run `npm run lint` to validate React code. |
+| **Unit Tests** | Run `pytest` to verify authentication, gameplay rules, and utility functions. |
+| **Integration Tests** | Start a PostgreSQL service and run API and database tests using `pytest` and `TestClient`. |
+| **Migration Checks** | Run `alembic upgrade head` and `alembic check` against the test database. |
+| **Build Verification** | Run `npm run build` and build FastAPI/React Docker images. |
+
+**Merge Rules:** Feature branches are merged into `dev` through pull requests. GitHub branch protection requires successful CI checks and peer review before merging into `dev` or `main`.
 
 #### Continuous Deployment (CD)
 
-Deployment is automated to reduce human error and ensure consistent delivery across environments:
+GitHub Actions uses separate deployment workflows for staging and production.
 
-- **Staging Deployment:** Merging approved PRs into the `dev` branch automatically triggers deployment to staging, where the team can verify features and integrations in a production-like environment.
-- **Production Deployment:** Approved merges into the `main` branch or designated release tags trigger deployment to production, including reviewed Alembic migrations (`alembic upgrade head`) and updates to active containers. Migrations are applied before application code that depends on the new schema, with a backup and rollback plan for destructive changes.
+| Environment | Trigger | Deployment Process |
+|---|---|---|
+| **Staging** | Successful merge into `dev` | Run CI, build Docker images, apply Alembic migrations, deploy containers, and verify health checks. |
+| **Production** | Approved merge into `main` | Run CI, verify database backup, apply reviewed migrations, deploy approved images, and verify health checks. |
 
-#### Monitoring and Post-Deployment QA
+Deployment credentials are stored in **GitHub Actions Secrets**. Failed deployments require investigation and application rollback where possible; database recovery is handled separately when necessary.
 
-After deployment, monitoring helps the team detect errors and availability issues:
+### Monitoring and Post-Deployment QA
 
-- **Centralized Logging:** System errors, API requests, and critical events are sent to Axiom, a central logging dashboard, for real-time observability.
+After deployment, monitoring helps the team detect application errors and availability issues.
+
+- **Centralized Logging:** System errors, API requests, and critical application events are sent to **Axiom**, a centralized logging platform, for real-time monitoring and troubleshooting.
