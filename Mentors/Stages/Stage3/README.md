@@ -1,4 +1,4 @@
-#ramz Raccon Technical Documentation
+# Raccon Technical Documentation
 
 ## Table of Contents
 
