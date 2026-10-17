@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlmodel import Session, select
 from core.database import get_session
 from models.user import User
@@ -88,14 +88,16 @@ def delete_account(
 @router.post("/forgot-password")
 def forgot_password(
     user_data: ForgotPassword,
-    session: Session = Depends(get_session), 
+    background_tasks: BackgroundTasks,
+    session: Session = Depends(get_session)
 ):
     # Get user from db based on entered email
     user = session.exec(select(User).where((User.email == user_data.email))).first()
         
     if user:
         pass_reset_token = reset_pass_token(data={"sub": str(user.id), "pwd":user.password[-10:]})
-        send_password_reset_email(user.email, pass_reset_token)
+        # send email after returning HTTP response
+        background_tasks.add_task(send_password_reset_email, user.email, pass_reset_token)
         logger.info(f"User requested password reset (ID: {user.id})")
     
     # Users with and without a registered account get the same conformation message   
@@ -104,7 +106,7 @@ def forgot_password(
 @router.post("/reset-password")
 def reset_password(
     user_data: ResetPassword,
-    session: Session = Depends(get_session), 
+    session: Session = Depends(get_session)
 ):
     payload = decode_reset_pass_token(user_data.token)
     if not payload:
