@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     
     AXIOM_TOKEN: Optional[str] = None
     AXIOM_DATASET: Optional[str] = None
+    
+    RESEND_API_KEY: str
 
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 
