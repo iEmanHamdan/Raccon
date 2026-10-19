@@ -1798,3 +1798,126 @@ video {
     margin-bottom: 72px;
   }
 }
+
+/* ==========================================
+   AUTH TABS - DESKTOP
+========================================== */
+
+.auth-tabs {
+  display: none;
+}
+
+.auth-promo__mobile-subtitle {
+  display: none;
+}
+
+/* ==========================================
+   LOGIN & REGISTER - MOBILE
+========================================== */
+
+@media (max-width: 767px) {
+  /* ===== Auth Tabs ===== */
+
+  .auth-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 4px;
+
+    width: 100%;
+    min-height: 52px;
+
+    padding: 4px;
+    margin-bottom: 24px;
+
+    background: var(--canvas);
+    border-radius: 14px;
+  }
+
+  .auth-tabs__link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 44px;
+
+    border-radius: 10px;
+
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+
+  .auth-tabs__link--active {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .auth-tabs__link--active:hover {
+    color: var(--on-accent);
+  }
+
+  /* ===== Login Mobile Header ===== */
+
+  .auth-promo__mobile-subtitle {
+    display: block;
+
+    margin: 8px 0 0;
+
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+
+    color: var(--on-panel-muted);
+
+    text-align: right;
+  }
+
+  /* ===== Login Form ===== */
+
+  .login-page {
+    width: 100%;
+  }
+
+  .login-form {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Title already displayed in mobile header */
+
+  .login-form__header {
+    display: none;
+  }
+
+  /* ===== Fields ===== */
+
+  .login-form__fields {
+    gap: 24px;
+  }
+
+  /* ===== Forgot Password ===== */
+
+  .login-form__forgot {
+    margin-top: 24px;
+  }
+
+  /* ===== Submit Button ===== */
+
+  .login-form__submit {
+    margin-top: 16px;
+  }
+
+  /* ===== Footer ===== */
+
+  .login-form__footer {
+    margin-top: 16px;
+    padding-top: 0;
+
+    border: none;
+  }
+}

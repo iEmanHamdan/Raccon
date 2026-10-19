@@ -1,5 +1,10 @@
 // The left side of the form witch have the animation of the nfc sacn and the context
-export default function AuthPromo({ scene, mobileTitle, variant = "default" }) {
+export default function AuthPromo({
+  scene,
+  mobileTitle,
+  mobileSubTitle,
+  variant = "default",
+}) {
   return (
     <div className={`auth-promo auth-promo--${variant}`}>
       {/* NFC Animation */}
@@ -7,9 +12,12 @@ export default function AuthPromo({ scene, mobileTitle, variant = "default" }) {
 
       {/* Content */}
       <div className="auth-promo__content">
-        {/* Mobile Title */}
+        {/* Mobile Title and subtitle */}
         {mobileTitle && (
           <h1 className="auth-promo__mobile-title">{mobileTitle}</h1>
+        )}
+        {mobileSubTitle && (
+          <p calssName="auth-promo__mobile-subtitle">{mobileSubTitle}</p>
         )}
 
         {/* Desktop Title */}
