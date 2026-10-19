@@ -18,3 +18,4 @@ class User(SQLModel, table=True):
     phone_number: str
     password: str
     role: str = Field(default="user")
+    avatar_id: int = Field(default=1)
