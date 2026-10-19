@@ -6,6 +6,7 @@ class UserRegister(BaseModel):
     email: str
     phone_number: str = Field(..., pattern=r"^\d{9}$")
     password: str = Field(max_length=72)
+    avatar_id: int = 1
 
 class UserLogin(BaseModel):
     username_or_email: str

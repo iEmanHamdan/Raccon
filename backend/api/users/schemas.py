@@ -9,8 +9,10 @@ class UserResponse(BaseModel):
     username: str
     email: str
     phone_number: str
+    avatar_id: int
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     username: Optional[str] = Field(None, pattern=r"^[a-z0-9_]+$")
     phone_number: Optional[str] = Field(None, pattern=r"^\d{9}$")
+    avatar_id: Optional[int] = None
