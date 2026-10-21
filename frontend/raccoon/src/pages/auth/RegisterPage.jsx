@@ -5,14 +5,20 @@ import AuthPromo from "../../components/layout/AuthPromo";
 import DehmScan from "../../components/ui/DehmScan";
 import RegisterForm from "../../components/auth/RegisterForm";
 
-import { registerUser } from "../../api/authApi";
+import { registerUser, loginUser, getCurrentUser } from "../../api/authApi";
+import { useAuth } from "../../context/AuthContext";
+import RegisterWelcome from "../../components/auth/RegisterWelcome";
 
 export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false); // is the submitting is load
 
   const [serverError, setServerError] = useState(""); // backend error
-  const [fieldErrors, setFieldErrors] = useState({}); // check the logic of auth in backend
+  const [fieldErrors, setFieldErrors] = useState({}); // check the logic of auth(name/email/password/..) in backend
   const [successMessage, setSuccessMessage] = useState(""); // message register success
+  const { signIn } = useAuth();
+
+  const [registeredUser, setRegisteredUser] = useState(null);
+  const [welcomeStatus, setWelcomeStatus] = useState("loading"); // after registeration success
 
   async function handleRegister(userData) {
     if (isSubmitting) {
@@ -27,7 +33,33 @@ export default function RegisterPage() {
     try {
       await registerUser(userData);
 
-      setSuccessMessage("تم إنشاء الحساب بنجاح");
+      setWelcomeStatus("loading");
+
+      setRegisteredUser({
+        name: userData.name,
+        avatarId: userData.avatar_id,
+      });
+
+      try {
+        const result = await loginUser({
+          identifier: userData.username,
+          password: userData.password,
+        });
+
+        if (
+          typeof result.access_token !== "string" ||
+          !result.access_token.trim()
+        ) {
+          throw new Error("Missing access token");
+        }
+
+        const profile = await getCurrentUser(result.access_token);
+
+        signIn(result.access_token, profile);
+        setWelcomeStatus("ready");
+      } catch {
+        setWelcomeStatus("error");
+      }
     } catch (error) {
       console.error("Register API Error:", {
         status: error.status,
@@ -77,6 +109,16 @@ export default function RegisterPage() {
     setSuccessMessage("");
   }
 
+  //after register nav to welcome page before login
+  if (registeredUser) {
+    return (
+      <RegisterWelcome
+        name={registeredUser.name}
+        avatarId={registeredUser.avatarId}
+        status={welcomeStatus} // loding, error, ready
+      />
+    );
+  }
   return (
     <AuthLayout
       promo={<AuthPromo scene={<DehmScan />} mobileTitle="أنشى حسابك" />}

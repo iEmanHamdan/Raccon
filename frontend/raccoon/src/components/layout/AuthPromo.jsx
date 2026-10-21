@@ -17,7 +17,7 @@ export default function AuthPromo({
           <h1 className="auth-promo__mobile-title">{mobileTitle}</h1>
         )}
         {mobileSubTitle && (
-          <p calssName="auth-promo__mobile-subtitle">{mobileSubTitle}</p>
+          <p className="auth-promo__mobile-subtitle">{mobileSubTitle}</p>
         )}
 
         {/* Desktop Title */}

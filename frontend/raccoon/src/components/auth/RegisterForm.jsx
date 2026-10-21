@@ -72,18 +72,16 @@ export default function RegisterForm({
   onRegister,
   isSubmitting = false,
   serverError = "",
-  fieldErrors = {},
+  fieldErrors = {}, // any field error from server
   successMessage = "",
   onEdit,
 }) {
   const [values, setValues] = useState(initialValues);
-
   const [touched, setTouched] = useState({});
-
   const errors = validateRegister(values);
-
   const isFormValid = Object.keys(errors).length === 0;
 
+  // error massage under the field: touched error or fieldErrors from server
   function getFieldError(name) {
     if (touched[name] && errors[name]) {
       return errors[name];

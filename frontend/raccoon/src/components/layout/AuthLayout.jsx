@@ -13,11 +13,10 @@ export default function AuthLayout({ children, promo }) {
         <section className="auth-layout__form">
           <div className="auth-layout__form-inner">
             <AuthTabs />
-            {children}
+            {children} {/*right side*/}
           </div>
         </section>
-
-        <aside className="auth-layout__promo">{promo}</aside>
+        <aside className="auth-layout__promo">{promo}</aside> {/*right side*/}
       </main>
     </div>
   );
