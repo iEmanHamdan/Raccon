@@ -10,6 +10,7 @@ from models.pack import Pack
 from models.journey_progress import JourneyProgress
 from api.auth.dependencies import get_current_user
 from api.journey.schemas import TagScanRequest, TagScanResponse, SetTrapRequest
+from core.logger import logger
 router = APIRouter(prefix="/journey", tags=["Journey"])
 
 @router.post("/scan", response_model=TagScanResponse)
@@ -19,6 +20,7 @@ def scan_tag(
     current_user: User = Depends(get_current_user)
 ):
     if request.injected_user_hash != current_user.user_hash:
+        logger.warning(f"Security Violation: Link sharing blocked for user {current_user.id} on tag {request.tag_hash}")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Security Violation: Link sharing detected.")
         
     tag = session.exec(select(Tag).where(Tag.static_hash == request.tag_hash)).first()

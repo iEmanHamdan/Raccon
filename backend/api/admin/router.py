@@ -10,7 +10,7 @@ from models.tag import Tag
 from models.user import User
 from api.admin.schemas import PackGenerateRequest, PackGenerateResponse, FactoryPackResponse, FactoryTagView
 from api.auth.dependencies import get_current_admin
-
+from core.logger import logger
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
 def generate_short_hash(length: int = 6) -> str:
@@ -62,6 +62,7 @@ def generate_packs(
         )
 
     session.commit()
+    logger.info(f"Admin {admin_user.username} generated {request.quantity} new packs (Mode: {request.mode})")
     return all_generated_packs
 
 @router.get("/factory/pack/{pack_id}", response_model=FactoryPackResponse)
