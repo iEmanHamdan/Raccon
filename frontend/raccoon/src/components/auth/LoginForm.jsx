@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
 import AuthField from "../ui/AuthField";
 import Button from "../ui/Button";
 import InlineMessage from "../ui/InlineMessage";
@@ -11,11 +10,7 @@ export default function LoginForm({
   serverError = "",
   onEdit,
 }) {
-  const [values, setValues] = useState({
-    identifier: "",
-    password: "",
-  });
-
+  const [values, setValues] = useState({ identifier: "", password: "" });
   const [touched, setTouched] = useState({});
 
   // Check if all required fields have values
@@ -83,7 +78,7 @@ export default function LoginForm({
           label="اسم المستخدم أو الإيميل"
           name="identifier"
           type="text"
-          inputDir="auto"
+          inputDir="auto" //for language
           value={values.identifier}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -119,11 +114,11 @@ export default function LoginForm({
       {/* Submit */}
       <div className="login-form__submit">
         <Button
-          type="submit"
+          type="submit" // make inSubmit work
           variant="primary"
           fullWidth
           disabled={!isFormValid}
-          loading={isSubmitting}
+          loading={isSubmitting} // children
         >
           ادخل
         </Button>

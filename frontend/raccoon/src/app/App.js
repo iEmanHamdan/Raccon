@@ -1,19 +1,23 @@
 import React from "react";
-
 import {
   BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
+  Routes, // paths container
+  Route, //ربط الباث في الاليمنت
+  Navigate, //nav user to another linke
+  useLocation, // hooks give u the current link
 } from "react-router-dom";
 
-// Auth Feature
+// Auth
 import RegisterPage from "../pages/auth/RegisterPage";
 import LoginPage from "../pages/auth/LoginPage";
+import { AuthProvider } from "../context/AuthContext";
+
+// Home
+import HomePage from "../pages/Home/HomePage";
+import ProtectedRoute from "../pages/auth/ProtectedRoute";
 
 function AppContent() {
-  const location = useLocation();
+  const location = useLocation(); // work only insdie BrowserRouter and App create useLocation(}
 
   // Pages without Sidebar and Topbar
   const isAuthPage =
@@ -24,11 +28,20 @@ function AppContent() {
       <main className={isAuthPage ? "" : "main-content"}>
         <Routes>
           {/* Default Route */}
-          <Route path="/" element={<Navigate to="/register" replace />} />
-
+          <Route path="/" element={<Navigate to="/register" replace />} />{" "}
+          {/* Element is the jsx file*/}
           {/* Authentication */}
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
+          {/*Home page*/}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <HomePage /> {/*This is the child in protectect props */}
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
     </div>
@@ -38,7 +51,9 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
