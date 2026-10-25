@@ -5,7 +5,6 @@ from sqlmodel import Session
 from core.database import get_session
 from core.security import SECRET_KEY, ALGORITHM
 from models.user import User
-from repositories.user_repo import UserRepository
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -23,7 +22,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Dep
     except jwt.PyJWTError:
         raise credentials_exception
         
-    user = UserRepository(session).get_by_id(User, user_id)
+    user = session.get(User, user_id)
     if user is None:
         raise credentials_exception
         
