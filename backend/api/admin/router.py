@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from services.admin_service import AdminService
 from models.user import User
-from api.admin.schemas import PackGenerateRequest, PackGenerateResponse, FactoryPackResponse,
+from api.admin.schemas import PackGenerateRequest, PackGenerateResponse, FactoryPackResponse
 from api.auth.dependencies import get_current_admin
 import uuid
 from typing import List
@@ -15,8 +15,7 @@ def generate_packs(
     service: AdminService = Depends(),
     admin_user: User = Depends(get_current_admin),
 ):
-    service.generate_packs(admin_user, **request.model_dump())
-    return {"message": "Packages generated successfully"}
+    return service.generate_packs(admin_user, **request.model_dump())
 
 
 @router.get("/factory/pack/{pack_id}", response_model=FactoryPackResponse)

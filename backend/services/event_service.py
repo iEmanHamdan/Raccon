@@ -29,7 +29,7 @@ class EventService:
             
         physical_tags = self.tags.get_by_pack_id(pack.id)
         
-        event_tags = self.event_tags.get_by_event_id(event.id)
+        event_tags = self.event_tags.get_all_by_event_id(event.id)
         
         config_map = {et.tag_id: et for et in event_tags}
         
@@ -52,7 +52,7 @@ class EventService:
             "tags":tags_view
         }
 
-    def setup_event_journey(self, user: User, event_id: uuid.UUID, request: List) -> None:
+    def setup_event_journey(self, user: User, event_id: uuid.UUID, request) -> None:
         event = self.events.get_event(event_id)
         if not event:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
@@ -129,5 +129,4 @@ class EventService:
 
         events = self.events.get_all_events(pack_ids)
         return events
-
-        
+    

@@ -1,5 +1,6 @@
 from sqlmodel import Session, select
 from models import User
+import uuid
 
 
 class UserRepository:
@@ -11,12 +12,18 @@ class UserRepository:
             select(User).where((User.username == username) | (User.email == email))
         ).first()
 
+    def get_by_username(self, username: str) -> User | None:
+        return self.session.exec(select(User).where((User.username == username))).first()
+    
     def get_by_email(self, email: str) -> User | None:
-        return self.session.exec(select(User).where((User.email == email))).first()
+            return self.session.exec(select(User).where((User.email == email))).first()
 
-    def get_by_id(self, user_id: str) -> User | None:
+    def get_by_id(self, user_id: str | uuid.UUID) -> User | None:
         return self.session.get(User, user_id)
 
+    def get_by_user_hash(self, user_hash: str) -> User | None:
+        return self.session.session.exec(select(User).where(User.user_hash == user_hash)).first()
+    
     def add_user(self, new_user: User) -> None:
         self.session.add(new_user)
 
