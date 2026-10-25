@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import googleLogo from "../../assets/googleLogo.png";
+
 import AuthField from "../ui/AuthField";
 import CharacterPicker from "../ui/CharacterPicker";
 import Button from "../ui/Button";
@@ -150,6 +150,10 @@ export default function RegisterForm({
       {/* Header */}
       <div className="register-form__header">
         <h1 className="register-form__title">أنشئ حسابك</h1>
+
+        <p className="register-form__signin">
+          عندك حساب؟ <Link to="/login">ادخل</Link>
+        </p>
       </div>
 
       {/* Character Picker */}
@@ -216,41 +220,42 @@ export default function RegisterForm({
           />
         </div>
 
-        {/*Password*/}
-        <AuthField
-          label="كلمة المرور"
-          name="password"
-          type="password"
-          value={values.password}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder="8 أحرف أو أكثر"
-          helper="8 أحرف أو أكثر"
-          error={getFieldError("password")}
-          autoComplete="new-password"
-        />
-        {/*confirmPassword*/}
-        <AuthField
-          label="تأكيد كلمة المرور"
-          name="confirmPassword"
-          type="password"
-          value={values.confirmPassword}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder="أعد كتابة كلمة المرور"
-          error={getFieldError("confirmPassword")}
-          autoComplete="new-password"
-        />
+        <div className="register-form__field-full">
+          <AuthField
+            label="كلمة المرور"
+            name="password"
+            type="password"
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="8 أحرف أو أكثر"
+            helper="8 أحرف أو أكثر"
+            error={getFieldError("password")}
+            autoComplete="new-password"
+          />
+        </div>
+
+        <div className="register-form__field-full">
+          <AuthField
+            label="تأكيد كلمة المرور"
+            name="confirmPassword"
+            type="password"
+            value={values.confirmPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="أعد كتابة كلمة المرور"
+            error={getFieldError("confirmPassword")}
+            autoComplete="new-password"
+          />
+        </div>
       </div>
 
-      {/* Backend Messages */}
-      <div className="register-form__feedback" aria-live="polite">
-        {serverError ? (
-          <InlineMessage type="error" message={serverError} />
-        ) : successMessage ? (
-          <InlineMessage type="success" message={successMessage} />
-        ) : null}
-      </div>
+      {/*this part for display backend message*/}
+      {serverError && <InlineMessage type="error" message={serverError} />}
+
+      {successMessage && (
+        <InlineMessage type="success" message={successMessage} />
+      )}
 
       {/* Submit */}
       <div className="register-form__submit">
@@ -265,24 +270,10 @@ export default function RegisterForm({
         </Button>
       </div>
 
-      {/* Google Button */}
-
-      <div className="register-form__google">
-        <Button type="button" variant="secondary" fullWidth disabled>
-          <img src={googleLogo} alt="" className="register-form__google-logo" />
-
-          <span>
-            المتابعة باستخدام <bdi>Google</bdi>
-          </span>
-        </Button>
-      </div>
-
       {/* Footer */}
-      <div className="register-form__footer">
-        <p className="register-form__signin">
-          عندك حساب؟ <Link to="/login">تسجيل الدخول</Link>
-        </p>
-      </div>
+      <p className="register-form__footer">
+        بحسابك تقدر تفعّل باقاتك وتدخل رحلات البحث.
+      </p>
     </form>
   );
 }

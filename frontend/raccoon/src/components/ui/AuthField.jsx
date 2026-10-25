@@ -116,14 +116,15 @@ export default function AuthField({
       </div>
 
       {/* Helper / Error Message */}
-      <p
-        id={messageId}
-        className="auth-field__message"
-        role={error ? "alert" : undefined}
-        aria-hidden={!message}
-      >
-        {message || "\u00A0"}
-      </p>
+      {message && (
+        <p
+          id={messageId}
+          className="auth-field__message"
+          role={error ? "alert" : undefined}
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
 }
