@@ -4,6 +4,41 @@ import AuthField from "../ui/AuthField";
 import Button from "../ui/Button";
 import InlineMessage from "../ui/InlineMessage";
 
+// Validate Username or Email
+function validateIdentifier(value) {
+  const identifier = value.trim();
+
+  // Required
+  if (!identifier) {
+    return "أدخل اسم المستخدم أو البريد الإلكتروني.";
+  }
+
+  // Email Validation
+  if (identifier.includes("@")) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(identifier)) {
+      return "أدخل بريدًا إلكترونيًا صحيحًا.";
+    }
+
+    return "";
+  }
+
+  // Username Length
+  if (identifier.length < 3) {
+    return "اسم المستخدم يجب أن يكون 3 أحرف على الأقل.";
+  }
+
+  // Username Format
+  const usernameRegex = /^[a-z0-9_]+$/;
+
+  if (!usernameRegex.test(identifier)) {
+    return "استخدم حروفًا إنجليزية صغيرة أو أرقامًا أو _ فقط.";
+  }
+
+  return "";
+}
+
 export default function LoginForm({
   onLogin,
   isSubmitting = false,
@@ -14,7 +49,8 @@ export default function LoginForm({
   const [touched, setTouched] = useState({});
 
   // Check if all required fields have values
-  const isFormValid = values.identifier.trim() !== "" && values.password !== "";
+  const isFormValid =
+    validateIdentifier(values.identifier) === "" && values.password !== "";
 
   // Update input values
   function handleChange(event) {
@@ -65,12 +101,9 @@ export default function LoginForm({
         <p className="login-form__subtitle">ادخل حسابك عشان تتابع باقاتك.</p>
       </div>
 
-      {/* Backend Error */}
-      {serverError && (
-        <div className="login-form__error">
-          <InlineMessage type="error" message={serverError} />
-        </div>
-      )}
+      <div className="login-form__error" aria-live="polite">
+        {serverError && <InlineMessage type="error" message={serverError} />}
+      </div>
 
       {/* Fields */}
       <div className="login-form__fields">
@@ -84,9 +117,7 @@ export default function LoginForm({
           onBlur={handleBlur}
           placeholder="اسم المستخدم أو البريد الإلكتروني"
           error={
-            touched.identifier && !values.identifier.trim()
-              ? "أدخل اسم المستخدم أو البريد الإلكتروني."
-              : ""
+            touched.identifier ? validateIdentifier(values.identifier) : ""
           }
           autoComplete="username"
         />

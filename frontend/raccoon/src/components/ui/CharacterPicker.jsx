@@ -37,11 +37,13 @@ export default function CharacterPicker({
         ))}
       </div>
 
-      {error && (
-        <p className="character-picker__error" role="alert">
-          {error}
-        </p>
-      )}
+      <p
+        className="character-picker__error"
+        role={error ? "alert" : undefined}
+        aria-hidden={!error}
+      >
+        {error || "\u00A0"}
+      </p>
     </fieldset>
   );
 }
