@@ -11,7 +11,7 @@ const navigationItems = [
   { label: "باقاتي", to: "/packages", disabled: false },
   { label: "التخصيص", to: "/customization", disabled: false },
   { label: "المتصدرين", to: "/leaderboard", disabled: false },
-  { label: "بكجاتي", to: "/my-packages", disabled: false },
+  { label: "المتجر", to: "/store", disabled: false },
 ];
 
 export default function AppNavbar() {

@@ -16,6 +16,9 @@ import { AuthProvider } from "../context/AuthContext";
 import HomePage from "../pages/Home/HomePage";
 import ProtectedRoute from "../pages/auth/ProtectedRoute";
 
+//Store
+import StorePage from "../pages/Store/StorePage";
+
 function AppContent() {
   const location = useLocation(); // work only insdie BrowserRouter and App create useLocation(}
 
@@ -42,6 +45,8 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          نعم
+          <Route path="/store" element={<StorePage />} />
         </Routes>
       </main>
     </div>
