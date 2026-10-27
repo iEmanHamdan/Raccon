@@ -17,3 +17,4 @@ axiom-py
 pydantic-settings
 scalar-fastapi
 resend==2.49.1
+python-multipart
