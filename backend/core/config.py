@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     
     RESEND_API_KEY: str
 
+    MAX_EDIT_LIMIT: int
+
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 
 settings = Settings()
