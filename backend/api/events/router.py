@@ -27,6 +27,14 @@ def setup_event_journey(
     service.setup_event_journey(current_user, event_id, request)
     return {"status": "success", "message": "Tag setup saved successfully."}
 
+@router.put("/{event_id}/edit")
+def edit_event(
+    event_id: uuid.UUID,
+    request: EventSetupRequest,
+    service: EventService = Depends(),
+    current_user: User = Depends(get_current_user)
+):
+    return service.edit_event(current_user, event_id, request)
 
 @router.patch("/{event_id}", response_model=EventResponse)
 def update_event(

@@ -1,6 +1,7 @@
 import uuid
 from pydantic import BaseModel, Field
 from typing import Optional 
+from datetime import datetime
 
 class UserResponse(BaseModel):
     id: uuid.UUID
@@ -10,6 +11,7 @@ class UserResponse(BaseModel):
     email: str
     phone_number: str
     avatar_id: int
+    created_at: datetime
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
