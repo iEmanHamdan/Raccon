@@ -51,16 +51,16 @@ class AdminService:
             
             self.session.flush() 
 
-            all_generated_packs.append(
-                    pack_id=new_pack.id,
-                    master_auth_hash=new_pack.master_auth_hash,
-                    tags=[{
+            all_generated_packs.append({
+                    "pack_id": new_pack.id,
+                    "master_auth_hash": new_pack.master_auth_hash,
+                    "tags": [{
                         "id": t.id, 
                         "static_hash": t.static_hash,
                         "sequence_num": t.sequence_num,
                         "is_printed": t.is_printed
                     } for t in generated_tags]
-                )
+                })
 
         self.session.commit()
         logger.info(f"Admin {admin_user.username} generated {quantity} new packs (Mode: {mode})")
@@ -75,12 +75,12 @@ class AdminService:
         
         tags_view = []
         for tag in tags:
-            tags_view.append(
-                sequence_num=tag.sequence_num,
-                tag_id=tag.id,
-                print_url=f"https://raccon.link/t/{tag.static_hash}",
-                is_printed=tag.is_printed
-            )
+            tags_view.append({
+                "sequence_num": tag.sequence_num,
+                "tag_id": tag.id,
+                "print_url": f"https://raccon.link/t/{tag.static_hash}",
+                "is_printed": tag.is_printed
+            })
             
         return {
             "pack_id":pack.id,

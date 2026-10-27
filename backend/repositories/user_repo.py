@@ -22,7 +22,7 @@ class UserRepository:
         return self.session.get(User, user_id)
 
     def get_by_user_hash(self, user_hash: str) -> User | None:
-        return self.session.session.exec(select(User).where(User.user_hash == user_hash)).first()
+        return self.session.exec(select(User).where(User.user_hash == user_hash)).first()
     
     def add_user(self, new_user: User) -> None:
         self.session.add(new_user)

@@ -23,7 +23,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Dep
     except jwt.PyJWTError:
         raise credentials_exception
         
-    user = UserRepository(session).get_by_id(User, user_id)
+    user = UserRepository(session).get_by_id(user_id)
     if user is None:
         raise credentials_exception
         

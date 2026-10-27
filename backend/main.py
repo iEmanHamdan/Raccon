@@ -10,11 +10,14 @@ from api.packs.router import router as packs_router
 from api.events.router import router as events_router
 from api.journey.router import router as journey_router
 from scalar_fastapi import get_scalar_api_reference
+from core.logger import listener
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
     yield
+    if listener:
+        listener.stop()
 
 app = FastAPI(title="Raccon Event Platform", lifespan=lifespan)
 
@@ -30,6 +33,8 @@ origins = [
     "https://react-learning.aalsalhi-eng.workers.dev",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(

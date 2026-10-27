@@ -140,7 +140,7 @@ class JourneyService:
         injected_user_hash: str,
         trap_type: Literal["boom", "freeze"],
         trap_value: int
-):
+    ):
         if injected_user_hash != user.user_hash:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Security Violation.")
 
