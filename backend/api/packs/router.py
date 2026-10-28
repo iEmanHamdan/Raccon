@@ -6,6 +6,7 @@ from models.user import User
 from api.auth.dependencies import get_current_user
 from api.packs.schemas import PackClaimRequest, PackResponse
 from models.event import Event
+from core.logger import logger
 
 router = APIRouter(prefix="/packs", tags=["Packs"])
 
@@ -48,6 +49,7 @@ def claim_pack(
     session.add(new_event)
     
     session.commit()
+    logger.info(f"Pack {pack.id} was claimed by user {current_user.id}")
     session.refresh(pack)
     
     return pack

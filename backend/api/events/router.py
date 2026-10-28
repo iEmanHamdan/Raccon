@@ -4,13 +4,12 @@ from core.database import get_session
 from models.user import User
 from models.tag import Tag
 from api.auth.dependencies import get_current_user
-from api.events.schemas import EventDetailResponse, EventTagConfigView, EventUpdateRequest, TagScanRequest, TagScanResponse
+from api.events.schemas import EventBase, EventDetailResponse, EventTagConfigView, EventUpdateRequest, EventCreateRequest, EventResponse, EventSetupRequest
 import uuid
 from models.pack import Pack
 from models.event import Event
 from models.event_tag import EventTag
-from api.events.schemas import EventCreateRequest, EventResponse, EventSetupRequest
-
+from typing import List
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -22,11 +21,11 @@ def get_event_details(
 ):
     event = session.get(Event, event_id)
     if not event:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="الفعالية غير موجودة.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
         
     pack = session.get(Pack, event.pack_id)
     if not pack or pack.owner_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="ليس لديك صلاحية للوصول لهذه الفعالية.")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not own this pack.")
         
     physical_tags = session.exec(
         select(Tag).where(Tag.pack_id == pack.id).order_by(Tag.sequence_num)
@@ -68,56 +67,56 @@ def setup_event_journey(
     event = session.get(Event, event_id)
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
-    
+        
     pack = session.get(Pack, event.pack_id)
     if not pack or pack.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not own this pack.")
 
-    existing_tags = session.exec(select(EventTag).where(EventTag.event_id == event_id)).all()
-    for et in existing_tags:
-        session.delete(et)
-    
-    for tag_data in request.tags_config:
-        event_tag = EventTag(
-            event_id=event.id,
-            tag_id=tag_data.tag_id,
-            tag_type=tag_data.tag_type,
-            content=tag_data.content.model_dump(exclude_none=True)
-        )
-        session.add(event_tag)
+    valid_tags = session.exec(select(Tag).where(Tag.pack_id == pack.id)).all()
+    valid_tag_ids = {tag.id for tag in valid_tags}
         
-    session.commit()
-    return {"status": "success", "message": "Player journey configured successfully"}
+    for tag_data in request.tags_config:
+        if tag_data.tag_id not in valid_tag_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=f"Tag ID {tag_data.tag_id} does not belong to this pack."
+            )
 
-
-@router.post("/scan", response_model=TagScanResponse)
-def scan_tag(
-    request: TagScanRequest,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
-    if request.injected_user_hash != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Security Violation.")
-
-    tag = session.exec(select(Tag).where(Tag.static_hash == request.tag_hash)).first()
-    if not tag:
-        raise HTTPException(status_code=404, detail="Invalid Tag.")
-
-    event = session.exec(
-        select(Event).where(Event.pack_id == tag.pack_id).order_by(Event.id.desc())
-    ).first()
-    
-    if not event or event.status != "active":
+    has_trap = any(tag.tag_type == "trap" for tag in request.tags_config)
+    if has_trap and pack.mode != "open":
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="هذه الفعالية غير نشطة حالياً (متوقفة مؤقتاً أو قيد الإعداد)."
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Only packs in 'open' mode can have trap tags configured."
         )
 
-    return TagScanResponse(
-        status="success",
-        message=f"Tag {tag.sequence_num} verified successfully!",
-        tag_sequence=tag.sequence_num
-    )
+    for tag_data in request.tags_config:
+        existing_tag = session.exec(
+            select(EventTag).where(
+                (EventTag.event_id == event.id) & (EventTag.tag_id == tag_data.tag_id)
+            )
+        ).first()
+
+        if existing_tag:
+            existing_tag.tag_type = tag_data.tag_type
+            existing_tag.content = tag_data.content.model_dump(exclude_none=True)
+            session.add(existing_tag)
+        else:
+            new_event_tag = EventTag(
+                event_id=event.id,
+                tag_id=tag_data.tag_id,
+                tag_type=tag_data.tag_type,
+                content=tag_data.content.model_dump(exclude_none=True)
+            )
+            session.add(new_event_tag)
+
+    if event.status == "draft" and len(request.tags_config) > 0:
+        event.status = "paused"
+        session.add(event)
+
+    session.commit()
+    
+    return {"status": "success", "message": "Tag setup saved successfully."}
+
 
 @router.patch("/{event_id}", response_model=EventResponse)
 def update_event(
@@ -128,12 +127,12 @@ def update_event(
 ):
     event = session.get(Event, event_id)
     if not event:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="الفعالية غير موجودة.")
-        
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
+
     pack = session.get(Pack, event.pack_id)
     if not pack or pack.owner_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="ليس لديك صلاحية لتعديل هذه الفعالية.")
-        
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not own this pack.")
+
     if request.title is not None:
         event.title = request.title
     if request.status is not None:
@@ -144,3 +143,17 @@ def update_event(
     session.refresh(event)
     
     return event
+
+@router.get("", response_model=List[EventBase])
+def list_my_events(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    packs = session.exec(select(Pack).where(Pack.owner_id == current_user.id)).all()
+    pack_ids = [p.id for p in packs]
+    
+    if not pack_ids:
+        return []
+
+    events = session.exec(select(Event).where(Event.pack_id.in_(pack_ids))).all()
+    return events
