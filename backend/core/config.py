@@ -3,7 +3,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Raccon API"
-    
+    GOOGLE_CLIENT_ID: str = ""
     DATABASE_URL: str
     SECRET_KEY: str
     

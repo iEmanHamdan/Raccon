@@ -8,7 +8,10 @@ from models.user import User
 from core.logger import logger
 import hmac
 import uuid
-
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from core.config import settings
+import secrets
 
 class AuthService:
     def __init__(self, session: Session = Depends(get_session)):
@@ -99,3 +102,39 @@ class AuthService:
 
         self.session.commit()
         logger.info(f"Password reset completed (ID: {user.id})")
+
+    def google_login(self, token: str) -> str:
+        try:
+            id_info = id_token.verify_oauth2_token(
+                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+            email = id_info.get("email")
+            name = id_info.get("name")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid Google token")
+
+        user = self.users.get_by_email(email)
+
+        if not user:
+            base_username = email.split('@')[0].lower()
+            safe_username = "".join(c for c in base_username if c.isalnum())
+            username = f"{safe_username}_{secrets.token_hex(3)}"
+            
+            random_password = secrets.token_urlsafe(20)
+            
+            user = User(
+                name=name,
+                username=username,
+                email=email,
+                phone_number="000000000",
+                password=hash_password(random_password),
+                avatar_id=1,
+            )
+            self.users.add_user(user)
+            self.session.commit()
+            self.session.refresh(user)
+            logger.info(f"New user registered via Google: {user.username} (ID: {user.id})")
+
+        access_token = create_access_token(data={"sub": str(user.id)})
+        logger.info(f"User logged in via Google: {user.username} (ID: {user.id})")
+        return access_token

@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, BackgroundTasks
 from services.auth_service import AuthService
 from models.user import User
-from api.auth.schemas import UserRegister, UserLogin, Token, ChangePassword, ForgotPassword, ResetPassword
+from api.auth.schemas import UserRegister, UserLogin, Token, ChangePassword, ForgotPassword, ResetPassword, GoogleLoginRequest
 from api.auth.dependencies import get_current_user
 from fastapi.security import OAuth2PasswordRequestForm
-
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -19,6 +18,14 @@ def login_user(
     service: AuthService = Depends()
 ):
     access_token = service.login(user_data.username, user_data.password)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/google", response_model=Token)
+def login_with_google(
+    request: GoogleLoginRequest,
+    service: AuthService = Depends()
+):
+    access_token = service.google_login(request.credential)
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/logout")
