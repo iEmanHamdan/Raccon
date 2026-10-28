@@ -1,8 +1,14 @@
-export default function FilterBar({ filters, value, onChange, sort }) {
+export default function FilterBar({
+  filters,
+  value,
+  onChange,
+  sort,
+  label = "نوع الباكج",
+}) {
   //Filter: list of options, value: selecter vlaue one of [All, openHunt, Sequential], onChange: the new selecter value, sort: react element we can pass throw it SortButton
   return (
     <div className="filter-bar">
-      <div className="filter-bar__options" role="group" aria-label="نوع الباكج">
+      <div className="filter-bar__options" role="group" aria-label={label}>
         {filters.map((filter) => (
           <button
             key={filter.value}

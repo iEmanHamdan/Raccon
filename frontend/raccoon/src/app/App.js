@@ -7,7 +7,7 @@ import {
   useLocation, // hooks give u the current link
 } from "react-router-dom";
 
-// Auth
+// Auth (Register / login)
 import RegisterPage from "../pages/auth/RegisterPage";
 import LoginPage from "../pages/auth/LoginPage";
 import { AuthProvider } from "../context/AuthContext";
@@ -16,8 +16,13 @@ import { AuthProvider } from "../context/AuthContext";
 import HomePage from "../pages/Home/HomePage";
 import ProtectedRoute from "../pages/auth/ProtectedRoute";
 
-//Store
+// Store Page
 import StorePage from "../pages/Store/StorePage";
+import PackagesPage from "../pages/Packages/PackagesPage";
+import CustomizationPage from "../pages/Customization/CustomizationPage";
+
+// Profile Page
+import ProfilePage from "../pages/Profile/ProfilePage";
 
 function AppContent() {
   const location = useLocation(); // work only insdie BrowserRouter and App create useLocation(}
@@ -45,8 +50,42 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          نعم
+          {/*Profile page*/}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          {/*Store page*/}
           <Route path="/store" element={<StorePage />} />
+          <Route
+            path="/packages"
+            element={
+              <ProtectedRoute>
+                <PackagesPage />
+              </ProtectedRoute>
+            }
+          />
+          {/*customization --> التخصيص */}
+          <Route
+            path="/customization"
+            element={
+              <ProtectedRoute>
+                <CustomizationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/customization/:packageId"
+            element={
+              <ProtectedRoute>
+                <CustomizationPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
     </div>

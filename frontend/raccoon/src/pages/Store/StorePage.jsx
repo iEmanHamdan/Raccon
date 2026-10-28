@@ -85,12 +85,7 @@ export default function StorePage() {
 
         <div className="store-page__grid">
           {visiblePackages.map((pkg) => (
-            <PackageCard
-              key={pkg.id}
-              pkg={pkg}
-              ended={pkg.ended}
-              onDetails={openDetails}
-            />
+            <PackageCard key={pkg.id} pkg={pkg} onDetails={openDetails} />
           ))}
         </div>
       </section>
@@ -214,11 +209,11 @@ export default function StorePage() {
                   }
                 }}
               >
-                اشترِ من سلة ↗
+                اشترِ من خلال رمز ↗
               </Button>
 
               <p>
-                بتنتقل لمتجر سلة لإكمال الدفع، وبعدها يوصلك رابط التفعيل على
+                بتنتقل لمتجر رمز لإكمال الدفع، وبعدها يوصلك رابط التفعيل على
                 إيميلك.
               </p>
             </div>

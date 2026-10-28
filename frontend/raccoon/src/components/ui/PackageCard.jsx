@@ -2,27 +2,14 @@ import Chip from "./Chip";
 import Button from "./Button";
 import Mark from "../../assets/Mark.png";
 
-//pkg: package info[title, mode,  description, price, cover], ended: out of stock or not, onDetails: function take the id after click on the "التفاصيل" button, onNotify: if available Inform me
-export default function PackageCard({
-  pkg,
-  ended = false,
-  onDetails,
-  onNotify,
-}) {
+// pkg: بيانات الباكج.
+// onDetails: دالة تستقبل معرّف الباكج لفتح تفاصيله.
+export default function PackageCard({ pkg, onDetails }) {
   const modeLabel = pkg.mode === "sequential" ? "تسلسلي" : "صيد مفتوح";
   const modeTone = pkg.mode === "sequential" ? "accent" : "dark";
 
-  function handleAction() {
-    if (ended) {
-      onNotify?.(pkg.id);
-      return;
-    }
-
-    onDetails(pkg.id);
-  }
-
   return (
-    <article className={`package-card ${ended ? "package-card--ended" : ""}`}>
+    <article className="package-card">
       <div
         className={`package-card__cover package-card__cover--${
           pkg.coverTone || "mint"
@@ -50,12 +37,6 @@ export default function PackageCard({
         <div className="package-card__mode">
           <Chip tone={modeTone}>{modeLabel}</Chip>
         </div>
-
-        {ended && (
-          <div className="package-card__ended">
-            <Chip tone="error">نفدت</Chip>
-          </div>
-        )}
       </div>
 
       <div className="package-card__body">
@@ -70,12 +51,8 @@ export default function PackageCard({
             {pkg.price} <span aria-label="ريال سعودي">ر.س</span>
           </strong>
 
-          <Button
-            variant="outline"
-            disabled={ended && !onNotify}
-            onClick={handleAction}
-          >
-            {ended ? "نبّهني إذا توفّر" : "التفاصيل"}
+          <Button variant="outline" onClick={() => onDetails(pkg.id)}>
+            التفاصيل
           </Button>
         </div>
       </div>

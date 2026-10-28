@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../ui/Navbar";
 import ProfileMenu from "../ui/ProfileMenu";
 import { useAuth } from "../../context/AuthContext";
-import { logoutUser } from "../../api/authApi";
+import { logoutUser } from "../../api/auth/authApi";
 import Mark from "../../assets/Mark.png";
 import { avatarImages } from "../ui/avatarImages";
 
@@ -48,6 +48,7 @@ export default function AppNavbar() {
         items={navigationItems}
         account={
           <ProfileMenu
+            accountPath="/profile" // in profile icon if press حسابي  will Route u in profile page
             name={user?.name || "حسابي"}
             username={user?.username}
             avatarSrc={avatarSrc}

@@ -3,6 +3,7 @@ export const packages = [
   {
     id: "games",
     title: "مملكة الألعاب",
+    pieces: 12,
     description: "قطع مخبّأة في صالة الألعاب، كل وحدة تدلّك على اللي بعدها.",
     meta: "12 قطعة · 60–90 دقيقة · 4–20 لاعب",
     price: 199,
@@ -10,7 +11,6 @@ export const packages = [
     coverTone: "mint",
     contents: [
       "12 قطعة NFC جاهزة للصق",
-      "12 بطاقة تلميح قابلة للكتابة",
       "رابط تفعيل للمالك (Master Claim Link)",
       "دليل تشغيل سريع",
     ],
@@ -21,6 +21,7 @@ export const packages = [
   {
     id: "museum",
     title: "ليلة المتحف",
+    pieces: 11,
     description: "جولة صيد في معرض أو بيت كبير، والنقاط للأسرع.",
     meta: "11 قطعة · 45–60 دقيقة · 6–30 لاعب",
     price: 179,
@@ -28,7 +29,6 @@ export const packages = [
     coverTone: "soft",
     contents: [
       "11 قطعة NFC جاهزة للصق",
-      "11 بطاقة تلميح قابلة للكتابة",
       "رابط تفعيل للمالك (Master Claim Link)",
       "دليل تشغيل سريع",
     ],
@@ -39,6 +39,7 @@ export const packages = [
   {
     id: "riyadh",
     title: "موسم الرياض",
+    pieces: 15,
     description: "باكج كبير للفعاليات والمهرجانات مع فخاخ.",
     meta: "15 قطعة · 90–120 دقيقة · 10–50 لاعب",
     price: 249,
@@ -46,7 +47,6 @@ export const packages = [
     coverTone: "mint",
     contents: [
       "15 قطعة NFC جاهزة للصق",
-      "15 بطاقة تلميح قابلة للكتابة",
       "رابط تفعيل للمالك (Master Claim Link)",
       "دليل تشغيل سريع",
     ],
@@ -57,6 +57,7 @@ export const packages = [
   {
     id: "birthday",
     title: "حفلة عيد ميلاد",
+    pieces: 8,
     description: "للأطفال والعائلة، تلميحات سهلة وممتعة.",
     meta: "8 قطع · 30–45 دقيقة · 3–15 لاعب",
     price: 129,
@@ -64,7 +65,6 @@ export const packages = [
     coverTone: "soft",
     contents: [
       "8 قطعة NFC جاهزة للصق",
-      "8 بطاقة تلميح قابلة للكتابة",
       "رابط تفعيل للمالك (Master Claim Link)",
       "دليل تشغيل سريع",
     ],
@@ -75,6 +75,7 @@ export const packages = [
   {
     id: "office",
     title: "تحدّي المكتب",
+    pieces: 10,
     description: "نشاط فريق العمل، يكسر الروتين في ساعة.",
     meta: "10 قطع · 45–60 دقيقة · 6–25 لاعب",
     price: 169,
@@ -82,7 +83,6 @@ export const packages = [
     coverTone: "mint",
     contents: [
       "10 قطعة NFC جاهزة للصق",
-      "10 بطاقة تلميح قابلة للكتابة",
       "رابط تفعيل للمالك (Master Claim Link)",
       "دليل تشغيل سريع",
     ],
@@ -93,6 +93,7 @@ export const packages = [
   {
     id: "camp",
     title: "رحلة البر",
+    pieces: 12,
     description: "للكشتات والمخيمات، القطع تتحمل الشمس.",
     meta: "12 قطعة · 60–90 دقيقة · 4–20 لاعب",
     price: 189,
@@ -100,13 +101,11 @@ export const packages = [
     coverTone: "soft",
     contents: [
       "12 قطعة NFC جاهزة للصق",
-      "12 بطاقة تلميح قابلة للكتابة",
       "رابط تفعيل للمالك (Master Claim Link)",
       "دليل تشغيل سريع",
     ],
     guideUrl: "",
     purchaseUrl: "",
     popularity: 1,
-    ended: true,
   },
 ];
