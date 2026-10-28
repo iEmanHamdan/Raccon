@@ -2,6 +2,7 @@ import uuid
 import string
 import secrets
 from sqlmodel import SQLModel, Field
+from datetime import datetime, timezone
 
 def generate_user_hash() -> str:
     alphabet = string.ascii_letters + string.digits
@@ -19,3 +20,4 @@ class User(SQLModel, table=True):
     password: str
     role: str = Field(default="user")
     avatar_id: int = Field(default=1)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

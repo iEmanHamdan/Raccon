@@ -3,7 +3,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Raccon API"
-    
+    GOOGLE_CLIENT_ID: str = ""
     DATABASE_URL: str
     SECRET_KEY: str
     
@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     AXIOM_DATASET: Optional[str] = None
     
     RESEND_API_KEY: str
+
+    MAX_EDIT_LIMIT: int
 
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 

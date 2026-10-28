@@ -78,4 +78,7 @@ class EventBase(BaseModel):
 
 class EventDetailResponse(EventBase):
     tags: List[EventTagConfigView]
+    edit_count: int
+    edits_remaining: int
+    max_edits: int
 
