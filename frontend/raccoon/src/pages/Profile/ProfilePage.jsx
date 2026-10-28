@@ -117,7 +117,7 @@ export default function ProfilePage() {
         setError("انتهت جلسة الدخول. سجّل الدخول مجددًا.");
       } else if (requestError.status === 400 || requestError.status === 409) {
         setError(
-          "تعذر قبول البيانات. تحقق منها؛ قد يكون اسم المستخدم مستخدمًا أو كلمة المرور الحالية غير صحيحة.",
+          "كلمة المرور الحالية غير صحيحة.",
         );
       } else {
         setError("تعذر تنفيذ الطلب. حاول مرة أخرى.");
