@@ -2,9 +2,10 @@
 import AuthNavbar from "./AuthNavbar";
 import AuthTabs from "../auth/AuthTabs";
 
-export default function AuthLayout({ children, promo }) {
+export default function AuthLayout({ children, promo, showTabs = true }) {
   // children: here anything we put it inside a componenet like   <AuthLayout> <h1> hi </h1>  </AuthLayout> =====> h1 is children
   // promo: for the animation side of the register and login
+  // showTabs: false on pages that are not register/login (forgot and reset password)
   return (
     <div className="auth-page">
       <AuthNavbar />
@@ -12,7 +13,7 @@ export default function AuthLayout({ children, promo }) {
       <main className="auth-layout">
         <section className="auth-layout__form">
           <div className="auth-layout__form-inner">
-            <AuthTabs />
+            {showTabs && <AuthTabs />}
             {children} {/*right side*/}
           </div>
         </section>

@@ -87,7 +87,42 @@ export async function getCurrentUser(accessToken) {
   return data;
 }
 
+// Shared helper for the password reset calls (JSON in, JSON out)
+async function postJson(path, body, errorMessage) {
+  const response = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(errorMessage);
+
+    error.status = response.status;
+    error.detail = data.detail; // e.g. "Invalid reset token" (expired, used or broken link)
+    throw error;
+  }
+
+  return data;
+}
+
+// forgot-password: same answer whether the email has an account or not
+export function requestPasswordReset(email) {
+  return postJson("/auth/forgot-password", { email }, "Forgot password failed");
+}
+
+// reset-password: save the new password (the link stops working after this)
+export function resetPassword({ token, newPassword }) {
+  return postJson(
+    "/auth/reset-password",
+    { token, new_password: newPassword },
+    "Reset password failed",
+  );
+}
+
 //change-password
 //delete-account
-//forgot-password
-//reset-password
