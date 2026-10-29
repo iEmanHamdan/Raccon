@@ -13,7 +13,7 @@ export default function AuthLayout({ children, promo, variant = "default" }) {
       <main className="auth-layout">
         <section className="auth-layout__form">
              <div className="auth-layout__form-inner">
-            {showTabs && <AuthTabs />}
+            {variant && <AuthTabs />}
             {children} {/*right side*/}
           </div>
         </section>
