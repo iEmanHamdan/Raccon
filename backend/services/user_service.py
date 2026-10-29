@@ -16,7 +16,11 @@ class UserService:
     
     def update_profile(self, current_user: User, user_data: dict):
         if user_data.get("username") and user_data.get("username") != current_user.username:
+<<<<<<< HEAD
             existing_user = self.users.get_by_username(user_data.username)
+=======
+            existing_user = self.users.get_by_username(user_data.get("username"))
+>>>>>>> upstream/Draft
             if existing_user:
                 raise HTTPException(status_code=400, detail="Username is already taken")
         
