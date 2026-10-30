@@ -1,83 +1,137 @@
-// userData and Token
-import { createContext, useContext, useState, useEffect } from "react";
-import { getCurrentUser } from "../api/authApi";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getCurrentUser } from "../api/users/usersApi";
 
-const AuthContext = createContext(null); // Apply when use useAuth() outer Provider
+const AuthContext = createContext(null);
 const TOKEN_KEY = "raccoon_access_token";
 
+// معرّف محلي يفصل كاش كل جلسة.
+// لا نضع التوكن نفسه داخل queryKey.
+function createSession(token) {
+  return {
+    token,
+    key: crypto.randomUUID(),
+  };
+}
+
 export function AuthProvider({ children }) {
-  // Authentication State For register
-  const [accessToken, setAccessToken] = useState(null);
-  const [user, setUser] = useState(null);
+  const queryClient = useQueryClient();
 
-  // Session Restoration State
-  const [isRestoring, setIsRestoring] = useState(true);
-  const [restoreError, setRestoreError] = useState("");
+  const [session, setSession] = useState(() =>
+    createSession(sessionStorage.getItem(TOKEN_KEY)),
+  );
 
-  // Restore session when React starts
-  useEffect(() => {
-    let active = true;
+  // نوقف طلب الحساب بعد حذفه، مع إبقاء رسالة النجاح مفتوحة.
+  const [accountDeleted, setAccountDeleted] = useState(false);
 
-    const savedToken = sessionStorage.getItem(TOKEN_KEY); // after refresh the page it will return the tokon
+  const accessToken = session.token;
+  const profileKey = ["profile", session.key];
 
-    if (!savedToken) {
-      setIsRestoring(false);
-      return undefined;
-    }
+  const profileQuery = useQuery({
+    queryKey: profileKey,
 
-    async function restoreSession() {
-      try {
-        // Verify saved token with FastAPI
-        const profile = await getCurrentUser(savedToken);
+    queryFn: ({ signal }) => getCurrentUser(accessToken, { signal }),
 
-        if (!active) return;
+    enabled: Boolean(accessToken) && !accountDeleted,
 
-        setAccessToken(savedToken);
-        setUser(profile);
-        setRestoreError("");
-      } catch (error) {
-        if (!active) return;
+    staleTime: 60_000,
 
-        if (error.status === 401 || error.status === 403) {
-          // Token is invalid
-          sessionStorage.removeItem(TOKEN_KEY);
+    // لا نكرر طلب الجلسة الفاشل تلقائيًا.
+    retry: false,
+  });
 
-          setAccessToken(null);
-          setUser(null);
-        } else {
-          // Network or server error
-          setRestoreError("تعذر التحقق من جلسة الدخول. حاول مرة أخرى.");
-        }
-      } finally {
-        if (active) {
-          setIsRestoring(false);
-        }
-      }
-    }
+  const unauthorized =
+    profileQuery.error?.status === 401 || profileQuery.error?.status === 403;
 
-    restoreSession();
+  const user =
+    accessToken && !unauthorized ? (profileQuery.data ?? null) : null;
 
-    return () => {
-      active = false;
-    };
-  }, []);
+  const isRestoring =
+    Boolean(accessToken) && profileQuery.isPending && !accountDeleted;
 
-  // Login
-  function signIn(token, userData) {
-    sessionStorage.setItem(TOKEN_KEY, token); // save the jwt token in the browser
+  // فشل التحديث الخلفي لا يخفي حسابًا سبق تحميله بنجاح.
+  const restoreError =
+    accessToken &&
+    !accountDeleted &&
+    !unauthorized &&
+    profileQuery.isError &&
+    !profileQuery.data
+      ? "تعذر التحقق من جلسة الدخول. حاول مرة أخرى."
+      : "";
 
-    setAccessToken(token);
-    setUser(userData);
-    setRestoreError("");
-  }
-
-  // Logout
-  function clearSession() {
+  const clearSession = useCallback(() => {
     sessionStorage.removeItem(TOKEN_KEY);
 
-    setAccessToken(null);
-    setUser(null);
-    setRestoreError("");
+    // نلغي الطلبات القديمة ونزيل بيانات الحساب من الكاش.
+    void queryClient.cancelQueries({
+      queryKey: ["profile"],
+    });
+
+    queryClient.removeQueries({
+      queryKey: ["profile"],
+    });
+
+    setAccountDeleted(false);
+    setSession(createSession(null));
+  }, [queryClient]);
+
+  // الجلسة غير صالحة: ننظفها.
+  // أخطاء الشبكة و500 لا تُعامل كتسجيل خروج.
+  useEffect(() => {
+    if (unauthorized) {
+      clearSession();
+    }
+  }, [unauthorized, clearSession]);
+
+  function signIn(token, userData) {
+    const nextSession = createSession(token);
+
+    void queryClient.cancelQueries({
+      queryKey: ["profile"],
+    });
+
+    queryClient.removeQueries({
+      queryKey: ["profile"],
+    });
+
+    sessionStorage.setItem(TOKEN_KEY, token);
+
+    // LoginPage وRegisterPage يجلبان المستخدم بالفعل.
+    // نستفيد من النتيجة بدل إرسال طلب إضافي مباشرة.
+    queryClient.setQueryData(["profile", nextSession.key], userData);
+
+    setAccountDeleted(false);
+    setSession(nextSession);
+  }
+
+  async function updateUser(updatedUser) {
+    // يمنع استجابة GET أقدم من الكتابة فوق نتيجة التعديل.
+    await queryClient.cancelQueries({
+      queryKey: profileKey,
+      exact: true,
+    });
+
+    queryClient.setQueryData(profileKey, updatedUser);
+  }
+
+  async function markAccountDeleted() {
+    sessionStorage.removeItem(TOKEN_KEY);
+
+    setAccountDeleted(true);
+
+    await queryClient.cancelQueries({
+      queryKey: profileKey,
+      exact: true,
+    });
+
+    // نبقي البيانات المعروضة مؤقتًا خلف نافذة نجاح الحذف.
+    // عند إغلاقها، close() تستدعي clearSession وتمسح الباقي.
   }
 
   return (
@@ -89,6 +143,8 @@ export function AuthProvider({ children }) {
         restoreError,
         signIn,
         clearSession,
+        updateUser,
+        markAccountDeleted,
       }}
     >
       {children}
@@ -96,13 +152,11 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Customize Hooks
 export function useAuth() {
   const context = useContext(AuthContext);
 
   if (context === null) {
     throw new Error("useAuth must be used within AuthProvider");
   }
-
   return context;
 }
