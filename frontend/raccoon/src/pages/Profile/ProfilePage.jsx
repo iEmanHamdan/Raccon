@@ -116,9 +116,7 @@ export default function ProfilePage() {
       if (requestError.status === 401) {
         setError("انتهت جلسة الدخول. سجّل الدخول مجددًا.");
       } else if (requestError.status === 400 || requestError.status === 409) {
-        setError(
-          "كلمة المرور الحالية غير صحيحة.",
-        );
+        setError("كلمة المرور الحالية غير صحيحة.");
       } else {
         setError("تعذر تنفيذ الطلب. حاول مرة أخرى.");
       }
@@ -426,7 +424,9 @@ export default function ProfilePage() {
                         onChange={change(editing)}
                         type={editing === "phone_number" ? "tel" : "text"}
                         inputDir={editing === "username" ? "ltr" : undefined}
-                        maxLength={editing === "phone_number" ? 9 : undefined}
+                        maxLength={
+                          { name: 30, username: 20, phone_number: 9 }[editing]
+                        }
                         required
                         autoComplete="off"
                       />
