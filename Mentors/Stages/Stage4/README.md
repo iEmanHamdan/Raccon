@@ -6,10 +6,10 @@
 
 | Member | Role | Responsibilities |
 |---|---|---|
-| Osama Alhamdan | Technical Lead, Full-stack | Leads technical decisions and the system architecture; maintains the repository, deployment and infrastructure (Docker, Cloudflare, Render, DNS); builds backend and frontend features (authentication, event editing, admin APIs, scan page, real-time leaderboard); writes backend unit tests |
-| Abdulrahman Alsalhi | Frontend Lead, Solution Architect | Leads frontend development and designs its feature-based structure; reviews frontend work; builds frontend features (login, store, claim, customization, profile); writes the frontend test suite |
-| Eman Hamdan | User Experience and Business Lead, Frontend | Leads the user experience and the business side: brand identity, UI/UX design in Figma (design system, user flows, screens) and stakeholder work; builds frontend features (home, navbar, account pages, store, admin) |
-| Ghaida Alsabti | Quality Assurance Lead, Backend | Leads quality assurance: writes and runs the QA test cases and the CI pipeline; runs the daily stand-ups, the Trello board and the GitHub branches; builds backend features (data model, N-tier structure, OAuth, factory, scan service, image storage) |
+| Osama Alhamdan | Technical Lead, Full-stack | Leads technical decisions and the system architecture; maintains the repository, deployment and infrastructure; develops backend and frontend features |
+| Abdulrahman Alsalhi | Frontend Lead, Solution Architect | Leads frontend development and its architecture; reviews frontend work; develops frontend features and tests |
+| Eman Hamdan | User Experience and Business Lead, Frontend | Leads the user experience, brand and UI/UX design, and the business side; develops frontend features |
+| Ghaida Alsabti | Quality Assurance Lead, Backend | Leads quality assurance and testing; runs the daily stand-ups, the Trello board and the GitHub branches; develops backend features |
 
 **Period:** 3 October 2026 to 21 November 2026, one setup sprint and four development sprints.
 
@@ -46,12 +46,55 @@ Trello numbers the stories slightly differently from the Stage 3 document, becau
 
 ### 0.2 Prioritization (MoSCoW)
 
-| Priority | Scope |
-|---|---|
-| **Must have** | Authentication, NFC tag packages, dashboard, experience modes (Sequential and Open Hunt), password reset, smart links, customer profile, NFC tag and package deactivation |
-| **Should have** | Leaderboard, smart-link hashing and optional device binding, up to three post-configuration edits per NFC tag |
-| **Could have** | UI animations and transitions, a congratulation screen, history and favorites, notifications |
-| **Won't have** | Loyalty program, maps and location-based features |
+The scope agreed in Stage 2 was prioritized with MoSCoW, then each user story was given a priority before it was placed in a sprint. **Must have** stories were planned first, because the MVP cannot work without them.
+
+```mermaid
+mindmap
+  root((Raccon MVP))
+    Must have
+      Accounts: register, login, logout, password reset, profile
+      Packs: generate, prepare, claim, view
+      Experience modes: Sequential and Open Hunt
+      Customization of packs and tags
+      Scanning hashed NFC tags
+      Admin pack management
+    Should have
+      Leaderboard
+      Traps: Freeze, Boom, Choose
+      Editing a saved configuration
+      Google sign-in
+    Could have
+      Experience preview
+      Animations and transitions
+      Congratulation screen
+      History, favorites, notifications
+    Won't have
+      Loyalty program
+      Maps and location features
+```
+
+| Priority | User story | Why this priority | Sprint |
+|---|---|---|---|
+| **Must** | US-01 Registration | Every owner and player needs an account. | 1 |
+| **Must** | US-02 Log In and Log Out | Protects owner data and personal experiences. | 1 |
+| **Must** | US-03 Forgot Password | Users must be able to recover their account. | 1 |
+| **Must** | US-04 Manage Account | Users update their profile and delete their account. | 2 |
+| **Must** | US-21 Prepare an NFC Package | Packs must exist before anyone can buy them. | 2 to 4 |
+| **Must** | US-22 Generate NFC Packages | Creates the packs and tags sold in the store. | 3 to 4 |
+| **Must** | US-05 Claim a Purchased Package | Links a bought pack to the owner's account. | 3 |
+| **Must** | US-06 View and Manage Purchased NFC Packages | Owners need to see the packs they own. | 3 |
+| **Must** | US-07 NFC Package Customization | Owners set up their experience in Sequential or Open Hunt mode. | 3 |
+| **Must** | US-08 Customize Tag Content | Each tag needs its own hint or content. | 3 |
+| **Must** | US-15 Scan a Hashed NFC Tag | Scanning is the core action of the game. | 3 |
+| **Must** | US-16, US-17 Scan results (Sequential and Open Hunt) | Players must see the result of each scan. | 3 to 4 |
+| **Should** | US-09 Edit a Saved Package Configuration | Lets owners fix mistakes, limited to three edits per tag. | 2 to 3 |
+| **Should** | US-10 to US-12 Configure Freeze, Boom and Choose Traps | Adds challenge to Open Hunt; the game works without them. | 3 to 4 |
+| **Should** | US-18, US-19 Experience a Freeze Trap and a Boom Trap | The player side of the traps. | 4 |
+| **Should** | US-20 View Leaderboard | Adds competition between players. | 4 |
+| **Should** | Google sign-in | Faster sign-up; email sign-in already covers the need. | 2 and 4 |
+| **Could** | US-13, US-14 Preview Sequential and Open Hunt Tag Experience | Helpful for owners, not required to play. | Not in MVP |
+| **Could** | Animations, congratulation screen | Improves the experience but not the core flow. | 4 (animations) |
+| **Won't** | Loyalty program, maps and location-based features | Out of MVP scope. | Not planned |
 
 ### 0.3 Sprint plan
 
