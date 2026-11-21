@@ -6,10 +6,10 @@
 
 | Member | Stage 4 role | Responsibilities |
 |---|---|---|
-| Eman Hamdan | **Project Manager**, UI/UX, frontend | Sprint planning and tracking on Trello, stand-ups, Figma designs, frontend pages (home, navbar, accounts, store, admin) |
-| Osama Alhamdan | **Source Control Manager**, DevOps, full-stack | Repository and branch management, pull request reviews and merges, CORS, password reset, event editing, admin APIs, scan page, real-time leaderboard, backend unit tests |
-| Ghaida Alsabti | **Quality Assurance**, backend | Test cases on every story, CI pipeline, data model, N-tier backend, Google OAuth, factory, scan service, image storage, pack preparation, rebuild codes, releases to `main` |
-| Abdulrahman Alsalhi | **Solution Architect**, frontend | Login, store, claim, customization and profile pages, feature-based frontend structure, frontend test suite |
+| Ghaida Alsabti | **Project Manager**, **Source Control Manager**, **Quality Assurance**, backend | Runs the daily stand-ups, manages the Trello board and the GitHub branches, writes and runs the QA test cases, CI pipeline; backend: data model, N-tier structure, Google OAuth, factory, scan service, image storage, pack preparation, rebuild codes |
+| Osama Alhamdan | DevOps, full-stack | Repository owner, deployment and infrastructure, CORS, password reset, event editing, admin APIs, scan page, real-time leaderboard, backend unit tests |
+| Abdulrahman Alsalhi | Solution Architect, frontend | Login, store, claim, customization and profile pages, feature-based frontend structure, frontend test suite |
+| Eman Hamdan | Business, UI/UX design, frontend | Business side and stakeholders, brand and Figma designs, frontend pages (home, navbar, accounts, store, admin) |
 
 **Period:** 3 October 2026 to 21 November 2026, one setup sprint and four development sprints.
 
@@ -96,7 +96,7 @@ QA test cases are written in the **QA** checklist of each story card and run whe
 
 ### 2.1 Daily stand-ups
 
-The team holds a short stand-up every day, in person at Holberton or in the Discord **stand-up** voice channel when a member is remote. Each member shares what they finished, what they will do next and any blockers. The Project Manager recorded the stand-ups that led to decisions or changes to the plan:
+The team holds a short stand-up every day, in person at Holberton or in the Discord **stand-up** voice channel when a member is remote. Each member shares what they finished, what they will do next and any blockers. The stand-ups that led to decisions or changes to the plan were written down:
 
 | Date | Progress reported | Decisions and adjustments |
 |---|---|---|
