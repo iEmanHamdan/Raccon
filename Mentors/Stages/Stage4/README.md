@@ -4,12 +4,12 @@
 
 **Team EAGO**
 
-| Member | Stage 4 role | Responsibilities |
+| Member | Role | Responsibilities |
 |---|---|---|
-| Ghaida Alsabti | **Project Manager**, **Source Control Manager**, **Quality Assurance**, backend | Runs the daily stand-ups, manages the Trello board and the GitHub branches, writes and runs the QA test cases, CI pipeline; backend: data model, N-tier structure, Google OAuth, factory, scan service, image storage, pack preparation, rebuild codes |
-| Osama Alhamdan | DevOps, full-stack | Repository owner, deployment and infrastructure, CORS, password reset, event editing, admin APIs, scan page, real-time leaderboard, backend unit tests |
-| Abdulrahman Alsalhi | Solution Architect, frontend | Login, store, claim, customization and profile pages, feature-based frontend structure, frontend test suite |
-| Eman Hamdan | Business, UI/UX design, frontend | Business side and stakeholders, brand and Figma designs, frontend pages (home, navbar, accounts, store, admin) |
+| Osama Alhamdan | Technical Lead, Full-stack | Leads technical decisions and the system architecture; maintains the repository, deployment and infrastructure (Docker, Cloudflare, Render, DNS); builds backend and frontend features (authentication, event editing, admin APIs, scan page, real-time leaderboard); writes backend unit tests |
+| Abdulrahman Alsalhi | Frontend Lead, Solution Architect | Leads frontend development and designs its feature-based structure; reviews frontend work; builds frontend features (login, store, claim, customization, profile); writes the frontend test suite |
+| Eman Hamdan | User Experience and Business Lead, Frontend | Leads the user experience and the business side: brand identity, UI/UX design in Figma (design system, user flows, screens) and stakeholder work; builds frontend features (home, navbar, account pages, store, admin) |
+| Ghaida Alsabti | Quality Assurance Lead, Backend | Leads quality assurance: writes and runs the QA test cases and the CI pipeline; runs the daily stand-ups, the Trello board and the GitHub branches; builds backend features (data model, N-tier structure, OAuth, factory, scan service, image storage) |
 
 **Period:** 3 October 2026 to 21 November 2026, one setup sprint and four development sprints.
 
